@@ -2,86 +2,112 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Hesera Clumsy</title>
     <style>
-        * { margin:0; padding:0; box-sizing:border-box; user-select:none; }
-        body { background:#06080e; font-family:'Segoe UI',system-ui,sans-serif; color:white; padding:16px; }
-        .app { max-width:500px; margin:0 auto; }
-        .header { display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; padding-bottom:15px; border-bottom:1px solid rgba(255,255,255,0.05); }
-        .app-name { font-size:20px; font-weight:800; }
-        .status { font-size:10px; background:rgba(34,197,94,0.12); padding:8px 14px; border-radius:20px; color:#4ade80; }
-        .card { background:#0d1017; border-radius:16px; padding:20px; margin-bottom:16px; border:1px solid rgba(255,255,255,0.04); }
-        .card-title { font-size:10px; color:#64748b; text-transform:uppercase; letter-spacing:2px; margin-bottom:14px; text-align:center; }
-        .preview-btns { display:flex; justify-content:center; gap:10px; }
-        .pbtn { width:55px; height:55px; border-radius:15px; background:#3b82f6; }
-        .monitor { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
-        .mon { background:#0a0d14; border-radius:10px; padding:12px; text-align:center; }
-        .mon-label { font-size:9px; color:#64748b; }
-        .mon-value { font-size:16px; font-weight:800; color:#60a5fa; font-family:monospace; }
-        .menu-row { display:flex; gap:8px; margin-bottom:16px; }
-        .menu-btn { flex:1; background:#111; border:1px solid rgba(255,255,255,0.06); border-radius:14px; padding:16px; text-align:center; cursor:pointer; font-size:12px; font-weight:700; color:#cbd5e1; }
-        .menu-btn:active { background:#1a1f2e; }
+        * { margin:0; padding:0; box-sizing:border-box; user-select:none; -webkit-tap-highlight-color:transparent; }
+        body { background:#06080e; font-family:'Segoe UI','Inter',system-ui,sans-serif; min-height:100vh; display:flex; align-items:center; justify-content:center; padding:16px; }
+        .menu-card { background:linear-gradient(160deg, rgba(13,16,23,0.98), rgba(8,10,16,0.98)); border-radius:24px; padding:28px 20px; border:1px solid rgba(255,255,255,0.05); width:100%; max-width:500px; }
+        .header { display:flex; justify-content:space-between; align-items:center; margin-bottom:24px; padding-bottom:14px; border-bottom:1px solid rgba(255,255,255,0.05); }
+        .app-name { font-size:20px; font-weight:800; color:white; }
+        .app-version { font-size:9px; color:#64748b; }
+        .status-badge { font-size:10px; background:rgba(34,197,94,0.12); padding:6px 12px; border-radius:20px; color:#4ade80; font-weight:700; }
+        .preview-area { background:rgba(6,8,13,0.8); border-radius:16px; padding:16px; margin-bottom:16px; text-align:center; }
+        .preview-title { font-size:9px; color:#64748b; text-transform:uppercase; letter-spacing:2px; margin-bottom:12px; }
+        .preview-buttons { display:flex; justify-content:center; gap:12px; }
+        .preview-btn { width:60px; height:60px; border-radius:18px; background:#3b82f6; }
+        .monitor { background:rgba(6,8,13,0.8); border-radius:16px; padding:16px; margin-bottom:24px; display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+        .monitor-item { background:#0a0d14; border-radius:12px; padding:12px; text-align:center; }
+        .monitor-label { font-size:9px; color:#64748b; text-transform:uppercase; }
+        .monitor-value { font-size:18px; font-weight:800; color:#60a5fa; font-family:monospace; }
+        .monitor-value.off { color:#334155; }
+        .menu-buttons { display:flex; gap:8px; margin-bottom:24px; }
+        .menu-btn { flex:1; background:rgba(13,16,24,0.8); border:1px solid rgba(255,255,255,0.06); border-radius:16px; padding:16px 8px; text-align:center; cursor:pointer; color:#cbd5e1; font-weight:700; font-size:12px; }
         .menu-btn .icon { font-size:24px; display:block; margin-bottom:4px; }
-        .start-btn { width:100%; background:#3b82f6; border:none; border-radius:14px; padding:18px; font-size:16px; font-weight:800; color:white; cursor:pointer; margin-bottom:12px; }
-        .start-btn.stop { background:#dc2626; }
+        .start-btn { width:100%; background:linear-gradient(135deg, #3b82f6, #1d4ed8); border:none; border-radius:16px; padding:18px; font-size:16px; font-weight:800; color:white; cursor:pointer; text-transform:uppercase; letter-spacing:1px; margin-bottom:16px; }
+        .start-btn.stop { background:linear-gradient(135deg, #dc2626, #991b1b); }
         .bottom-row { display:flex; gap:8px; }
-        .bottom-btn { flex:1; padding:14px; border:none; border-radius:12px; font-size:11px; font-weight:700; cursor:pointer; color:white; }
+        .bottom-btn { flex:1; padding:12px; border:none; border-radius:12px; font-size:11px; font-weight:700; cursor:pointer; color:white; text-align:center; }
         .btn-tg { background:#1e293b; }
-        .modal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.95); z-index:1000; padding:20px; overflow-y:auto; }
-        .modal.active { display:flex; align-items:center; justify-content:center; }
-        .modal-content { background:#0d1017; border-radius:20px; padding:24px; width:100%; max-width:450px; max-height:85vh; overflow-y:auto; }
+        .btn-report { background:rgba(239,68,68,0.15); color:#f87171; border:1px solid rgba(239,68,68,0.2); }
+
+        .modal { position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.95); z-index:1000; display:none; align-items:center; justify-content:center; padding:16px; }
+        .modal.active { display:flex; }
+        .modal-content { background:#0d1017; border-radius:20px; padding:24px; width:100%; max-width:460px; max-height:85vh; overflow-y:auto; }
         .modal-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; }
-        .modal-title { font-size:18px; font-weight:800; }
+        .modal-title { font-size:18px; font-weight:800; color:white; }
         .modal-close { background:#1e293b; border:none; color:white; width:32px; height:32px; border-radius:50%; cursor:pointer; font-size:16px; }
         .form-group { margin-bottom:14px; }
-        .form-label { display:block; color:#94a3b8; font-size:11px; font-weight:600; margin-bottom:6px; text-transform:uppercase; }
-        .form-input { width:100%; background:#0a0d14; border:2px solid #1e293b; border-radius:10px; padding:12px; font-size:14px; color:white; outline:none; }
+        .form-label { display:block; color:#94a3b8; font-size:11px; font-weight:600; margin-bottom:6px; text-transform:uppercase; letter-spacing:0.5px; }
+        .form-input { width:100%; background:#0a0d14; border:2px solid #1e293b; border-radius:12px; padding:12px 16px; font-size:14px; color:white; outline:none; }
         .form-input:focus { border-color:#3b82f6; }
-        .vpn-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:6px; margin-bottom:14px; }
-        .vpn-opt { padding:12px 6px; background:#0a0d14; border:2px solid #1e293b; border-radius:10px; color:#94a3b8; font-size:11px; font-weight:700; cursor:pointer; text-align:center; }
-        .vpn-opt.selected { border-color:#3b82f6; background:rgba(59,130,246,0.15); color:white; }
-        .save-btn { width:100%; background:#3b82f6; border:none; border-radius:12px; padding:14px; font-size:15px; font-weight:700; color:white; cursor:pointer; margin-top:16px; }
+        textarea.form-input { resize:vertical; min-height:80px; }
+        .vpn-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; margin-bottom:16px; }
+        .vpn-option { padding:12px 8px; background:rgba(10,13,20,0.8); border:2px solid #1e293b; border-radius:12px; color:#94a3b8; font-size:12px; font-weight:700; cursor:pointer; transition:0.2s; text-align:center; }
+        .vpn-option:hover { border-color:#3b82f6; color:white; }
+        .vpn-option.selected { border-color:#3b82f6; background:rgba(59,130,246,0.15); color:white; }
+
+        .button-tabs { display:flex; gap:8px; margin-bottom:16px; }
+        .button-tab { flex:1; padding:10px; background:rgba(10,13,20,0.8); border:2px solid #1e293b; border-radius:10px; color:#94a3b8; font-size:12px; font-weight:700; cursor:pointer; text-align:center; }
+        .button-tab.active { border-color:#3b82f6; background:rgba(59,130,246,0.15); color:white; }
+        .slider-group { margin-bottom:14px; }
+        .slider-label { display:flex; justify-content:space-between; color:#cbd5e1; font-size:12px; margin-bottom:6px; }
+        .slider-value { color:#60a5fa; font-family:monospace; font-weight:700; }
+        input[type="range"] { width:100%; height:4px; -webkit-appearance:none; background:#1e293b; border-radius:4px; outline:none; margin:12px 0; }
+        input[type="range"]::-webkit-slider-thumb { -webkit-appearance:none; width:18px; height:18px; background:#3b82f6; border-radius:50%; cursor:pointer; }
+
         .config-card { background:#111827; border:1px solid rgba(255,255,255,0.06); border-radius:12px; padding:14px; margin-bottom:8px; }
-        .config-name { font-size:14px; font-weight:700; }
+        .config-name { font-size:14px; font-weight:700; color:white; }
         .config-creator { font-size:11px; color:#94a3b8; margin-top:2px; }
-        .config-badges { display:flex; gap:4px; margin-top:6px; }
-        .badge { font-size:9px; padding:4px 8px; border-radius:12px; background:rgba(59,130,246,0.12); color:#60a5fa; }
+        .config-badges { display:flex; gap:4px; margin-top:6px; flex-wrap:wrap; }
+        .badge { font-size:9px; padding:4px 8px; border-radius:12px; font-weight:600; }
+        .badge-vpn { background:rgba(59,130,246,0.12); color:#60a5fa; }
+        .badge-open { background:rgba(34,197,94,0.12); color:#4ade80; }
+        .badge-locked { background:rgba(239,68,68,0.12); color:#f87171; }
         .config-actions { display:flex; gap:6px; margin-top:10px; }
-        .config-btn { padding:8px 14px; border:none; border-radius:8px; font-size:11px; font-weight:700; cursor:pointer; }
+        .config-btn { padding:8px 14px; border:none; border-radius:8px; font-size:11px; font-weight:700; cursor:pointer; color:white; }
         .btn-edit { background:rgba(59,130,246,0.2); color:#60a5fa; }
         .btn-delete { background:rgba(239,68,68,0.15); color:#f87171; }
         .btn-activate { background:rgba(34,197,94,0.2); color:#4ade80; }
-        .color-grid { display:flex; gap:6px; flex-wrap:wrap; margin-bottom:12px; }
-        .color-opt { width:32px; height:32px; border-radius:8px; cursor:pointer; border:2px solid transparent; }
-        .color-opt.selected { border-color:white; }
-        .toast { position:fixed; bottom:30px; left:20px; right:20px; background:#1e293b; padding:14px; border-radius:12px; text-align:center; font-weight:600; font-size:13px; opacity:0; transition:0.3s; z-index:9999; pointer-events:none; }
+
+        .color-grid { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:16px; }
+        .color-option { width:36px; height:36px; border-radius:10px; cursor:pointer; border:2px solid transparent; }
+        .color-option.selected { border-color:white; }
+
+        .save-btn { width:100%; background:linear-gradient(135deg, #3b82f6, #1d4ed8); border:none; border-radius:14px; padding:14px; font-size:16px; font-weight:700; color:white; cursor:pointer; margin-top:16px; }
+
+        .toast { position:fixed; bottom:30px; left:20px; right:20px; background:#1e293b; color:white; padding:14px; border-radius:14px; text-align:center; font-weight:600; font-size:13px; opacity:0; transition:0.3s; z-index:9999; pointer-events:none; }
         .toast.show { opacity:1; }
+
+        .floating-panel { position:fixed; z-index:9998; display:none; background:rgba(26,31,46,0.95); border-radius:16px; padding:10px; cursor:move; border:2px solid rgba(59,130,246,0.3); box-shadow:0 10px 30px rgba(0,0,0,0.5); touch-action:none; top:150px; left:50px; }
+        .floating-panel.active { display:flex; }
+        .floating-btn { width:55px; height:55px; border:none; border-radius:15px; cursor:pointer; margin:3px; font-size:14px; font-weight:bold; color:white; background:#3b82f6; opacity:0.5; transition:all 0.3s; }
+        .floating-btn.active-btn { opacity:1; background:#22c55e; box-shadow:0 0 15px rgba(34,197,94,0.5); }
     </style>
 </head>
 <body>
 
-<div class="app">
+<div class="menu-card" id="mainMenu">
     <div class="header">
-        <div><div class="app-name">Hesera Clumsy</div></div>
-        <div class="status" id="statusBadge">● ONLINE</div>
+        <div><div class="app-name">Hesera Clumsy</div><div class="app-version">v3.0</div></div>
+        <div class="status-badge" id="statusBadge">● ONLINE</div>
     </div>
     
-    <div class="card">
-        <div class="card-title">📱 ПРЕДПРОСМОТР КНОПОК</div>
-        <div class="preview-btns"><div class="pbtn"></div><div class="pbtn"></div><div class="pbtn"></div></div>
-    </div>
-    
-    <div class="card">
-        <div class="monitor">
-            <div class="mon"><div class="mon-label">📥 Задержка</div><div class="mon-value" id="mCD">0ms</div></div>
-            <div class="mon"><div class="mon-label">📤 Задержка</div><div class="mon-value" id="mSD">0ms</div></div>
-            <div class="mon"><div class="mon-label">📥 Потеря</div><div class="mon-value" id="mCL">0%</div></div>
-            <div class="mon"><div class="mon-label">📤 Потеря</div><div class="mon-value" id="mSL">0%</div></div>
+    <div class="preview-area">
+        <div class="preview-title">📱 ПРЕДПРОСМОТР КНОПОК</div>
+        <div class="preview-buttons" id="previewButtons">
+            <div class="preview-btn"></div><div class="preview-btn"></div><div class="preview-btn"></div>
         </div>
     </div>
     
-    <div class="menu-row">
+    <div class="monitor">
+        <div class="monitor-item"><div class="monitor-label">📥 Задержка</div><div class="monitor-value off" id="mCD">0ms</div></div>
+        <div class="monitor-item"><div class="monitor-label">📤 Задержка</div><div class="monitor-value off" id="mSD">0ms</div></div>
+        <div class="monitor-item"><div class="monitor-label">📥 Потеря</div><div class="monitor-value off" id="mCL">0%</div></div>
+        <div class="monitor-item"><div class="monitor-label">📤 Потеря</div><div class="monitor-value off" id="mSL">0%</div></div>
+    </div>
+    
+    <div class="menu-buttons">
         <div class="menu-btn" onclick="openModal('configModal')"><span class="icon">⚙️</span>Конфиг</div>
         <div class="menu-btn" onclick="openModal('customModal')"><span class="icon">🎨</span>Кастом</div>
     </div>
@@ -90,8 +116,14 @@
     
     <div class="bottom-row">
         <button class="bottom-btn btn-tg" onclick="window.open('https://t.me/hesers','_blank')">📱 Telegram</button>
-        <button class="bottom-btn" onclick="showToast('🚩 Жалоба отправлена')" style="background:rgba(239,68,68,0.15);color:#f87171;border:1px solid rgba(239,68,68,0.2);">🚩 Жалоба</button>
+        <button class="bottom-btn btn-report" onclick="showToast('🚩 Жалоба отправлена')">🚩 Жалоба</button>
     </div>
+</div>
+
+<div class="floating-panel" id="floatingPanel">
+    <button class="floating-btn" onclick="toggleFloatingBtn(0)">⚡1</button>
+    <button class="floating-btn" onclick="toggleFloatingBtn(1)">⚡2</button>
+    <button class="floating-btn" onclick="toggleFloatingBtn(2)">⚡3</button>
 </div>
 
 <div class="modal" id="configModal">
@@ -105,20 +137,49 @@
 <div class="modal" id="createModal">
     <div class="modal-content">
         <div class="modal-header"><div class="modal-title" id="editorTitle">Создание конфига</div><button class="modal-close" onclick="closeModal('createModal')">✕</button></div>
-        <div class="form-group"><label class="form-label">Название</label><input class="form-input" id="cfgName" placeholder="Введите название"></div>
-        <div class="form-group"><label class="form-label">Создатель</label><input class="form-input" id="cfgCreator" placeholder="Введите имя"></div>
-        <div class="form-group"><label class="form-label">Описание</label><input class="form-input" id="cfgDesc" placeholder="Описание"></div>
-        <div class="form-group"><label class="form-label">VPN</label>
+        <div class="form-group"><label class="form-label">Название конфига</label><input class="form-input" id="cfgName" placeholder="Введите название"></div>
+        <div class="form-group"><label class="form-label">Имя создателя</label><input class="form-input" id="cfgCreator" placeholder="Введите имя"></div>
+        <div class="form-group"><label class="form-label">Описание</label><textarea class="form-input" id="cfgDesc" placeholder="Введите описание"></textarea></div>
+        
+        <div class="form-group"><label class="form-label">⚙️ Настройки кнопок</label>
+            <div class="button-tabs">
+                <button class="button-tab active" onclick="switchTab(0)">Кнопка 1</button>
+                <button class="button-tab" onclick="switchTab(1)">Кнопка 2</button>
+                <button class="button-tab" onclick="switchTab(2)">Кнопка 3</button>
+            </div>
+            <div class="slider-group">
+                <div class="slider-label"><span>📥 Задержка клиента</span><span class="slider-value" id="btnCD">0 ms</span></div>
+                <input type="range" min="0" max="8000" value="0" oninput="updateSlider('clientDelay')">
+            </div>
+            <div class="slider-group">
+                <div class="slider-label"><span>📥 Потеря клиента</span><span class="slider-value" id="btnCL">0%</span></div>
+                <input type="range" min="0" max="100" value="0" oninput="updateSlider('clientLoss')">
+            </div>
+            <div class="slider-group">
+                <div class="slider-label"><span>📤 Задержка сервера</span><span class="slider-value" id="btnSD">0 ms</span></div>
+                <input type="range" min="0" max="8000" value="0" oninput="updateSlider('serverDelay')">
+            </div>
+            <div class="slider-group">
+                <div class="slider-label"><span>📤 Потеря сервера</span><span class="slider-value" id="btnSL">0%</span></div>
+                <input type="range" min="0" max="100" value="0" oninput="updateSlider('serverLoss')">
+            </div>
+            <div class="slider-group">
+                <div class="slider-label"><span>⏱️ Таймер (сек)</span><span class="slider-value" id="btnTimer">0 сек</span></div>
+                <input type="range" min="0" max="300" value="0" oninput="updateSlider('timer')">
+            </div>
+        </div>
+        
+        <div class="form-group"><label class="form-label">Выберите VPN</label>
             <div class="vpn-grid">
-                <div class="vpn-opt selected" onclick="selectVPN('pcapdroid',this)">PcapDroid</div>
-                <div class="vpn-opt" onclick="selectVPN('localvpn',this)">LocalVPN</div>
-                <div class="vpn-opt" onclick="selectVPN('toyshark',this)">ToyShark</div>
+                <div class="vpn-option selected" onclick="selectVPN('pcapdroid',this)">PcapDroid</div>
+                <div class="vpn-option" onclick="selectVPN('localvpn',this)">LocalVPN</div>
+                <div class="vpn-option" onclick="selectVPN('toyshark',this)">ToyShark</div>
             </div>
         </div>
         <div class="form-group"><label class="form-label">Шифровка</label>
             <div class="vpn-grid" style="grid-template-columns:1fr 1fr;">
-                <div class="vpn-opt selected" onclick="selectEncryption('none',this)">🔓 NONE</div>
-                <div class="vpn-opt" onclick="selectEncryption('free',this)">🔒 FREE</div>
+                <div class="vpn-option selected" onclick="selectEnc('none',this)">🔓 NONE</div>
+                <div class="vpn-option" onclick="selectEnc('free',this)">🔒 FREE</div>
             </div>
         </div>
         <button class="save-btn" id="saveCfgBtn" onclick="saveConfig()">💾 Сохранить</button>
@@ -136,165 +197,95 @@
 <div class="toast" id="toast"></div>
 
 <script>
-    let configs = JSON.parse(localStorage.getItem('clumsy_configs') || '[]');
-    let selectedVPN = 'pcapdroid', selectedEnc = 'none', editingIndex = -1;
-    let accentColor = '#3b82f6';
+    let configs = JSON.parse(localStorage.getItem('clumsy_cfg')||'[]');
+    let selectedVPN = 'pcapdroid', selectedEnc = 'none', editingIdx = -1, activeTab = 0;
+    let accentColor = localStorage.getItem('clumsy_color')||'#3b82f6';
+    let systemActive = false, activeBtn = -1;
+    let btnSettings = [
+        {clientDelay:0,clientLoss:0,serverDelay:0,serverLoss:0,timer:0},
+        {clientDelay:0,clientLoss:0,serverDelay:0,serverLoss:0,timer:0},
+        {clientDelay:0,clientLoss:0,serverDelay:0,serverLoss:0,timer:0}
+    ];
     const colors = ['#3b82f6','#8b5cf6','#22c55e','#f59e0b','#ef4444','#ec4899'];
 
-    function showToast(msg) {
-        const t = document.getElementById('toast');
-        t.textContent = msg; t.classList.add('show');
-        setTimeout(() => t.classList.remove('show'), 2000);
+    function showToast(m){var t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(function(){t.classList.remove('show')},2000);}
+    function openModal(id){document.getElementById(id).classList.add('active');if(id=='configModal')renderConfigs();if(id=='customModal')renderColors();}
+    function closeModal(id){document.getElementById(id).classList.remove('active');}
+
+    function renderConfigs(){
+        var l=document.getElementById('configsList');
+        if(!configs.length){l.innerHTML='<p style="color:#64748b;text-align:center;padding:20px;">Нет конфигов</p>';return;}
+        l.innerHTML=configs.map(function(c,i){return '<div class="config-card"><div class="config-name">'+(c.enc==='free'?'🔒':'🔓')+' '+c.name+'</div><div class="config-creator">👤 '+c.creator+'</div><div class="config-badges"><span class="badge badge-vpn">📡 '+c.vpn+'</span><span class="badge '+(c.enc==='free'?'badge-locked':'badge-open')+'">'+(c.enc==='free'?'🔒 Закрытый':'🔓 Открытый')+'</span></div><div class="config-actions">'+(c.enc!=='free'?'<button class="config-btn btn-edit" onclick="editConfig('+i+')">✎</button>':'')+'<button class="config-btn btn-delete" onclick="deleteConfig('+i+')">✕</button><button class="config-btn btn-activate" onclick="activateConfig('+i+')">⚡</button></div></div>';}).join('');
     }
 
-    function openModal(id) {
-        document.getElementById(id).classList.add('active');
-        if (id === 'configModal') renderConfigs();
-        if (id === 'customModal') renderColors();
+    function activateConfig(i){var c=configs[i];btnSettings=c.buttons||btnSettings;showToast('✅ Конфиг "'+c.name+'" активирован');closeModal('configModal');}
+
+    function editConfig(i){
+        var c=configs[i];editingIdx=i;
+        document.getElementById('editorTitle').textContent='Редактирование';
+        document.getElementById('cfgName').value=c.name;document.getElementById('cfgCreator').value=c.creator;
+        document.getElementById('cfgDesc').value=c.desc||'';selectedVPN=c.vpn;selectedEnc=c.enc;
+        btnSettings=c.buttons||btnSettings;activeTab=0;
+        updateVPNUI();updateEncUI();updateTabs();loadSliders();
+        closeModal('configModal');openModal('createModal');
     }
 
-    function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+    function deleteConfig(i){configs.splice(i,1);localStorage.setItem('clumsy_cfg',JSON.stringify(configs));renderConfigs();showToast('🗑️ Удалено');}
 
-    function renderConfigs() {
-        const list = document.getElementById('configsList');
-        if (!configs.length) { list.innerHTML = '<p style="color:#64748b;text-align:center;padding:20px;">Нет конфигов</p>'; return; }
-        list.innerHTML = configs.map((c,i) => `
-            <div class="config-card">
-                <div class="config-name">${c.enc==='free'?'🔒':'🔓'} ${c.name}</div>
-                <div class="config-creator">👤 ${c.creator}</div>
-                <div class="config-badges"><span class="badge">📡 ${c.vpn}</span></div>
-                <div class="config-actions">
-                    ${c.enc!=='free'?`<button class="config-btn btn-edit" onclick="editConfig(${i})">✎</button>`:''}
-                    <button class="config-btn btn-delete" onclick="deleteConfig(${i})">✕</button>
-                    <button class="config-btn btn-activate" onclick="activateConfig(${i})">⚡</button>
-                </div>
-            </div>
-        `).join('');
+    function openCreateModal(){
+        editingIdx=-1;document.getElementById('editorTitle').textContent='Создание конфига';
+        document.getElementById('cfgName').value='';document.getElementById('cfgCreator').value='';document.getElementById('cfgDesc').value='';
+        selectedVPN='pcapdroid';selectedEnc='none';btnSettings=[{clientDelay:0,clientLoss:0,serverDelay:0,serverLoss:0,timer:0},{clientDelay:0,clientLoss:0,serverDelay:0,serverLoss:0,timer:0},{clientDelay:0,clientLoss:0,serverDelay:0,serverLoss:0,timer:0}];
+        activeTab=0;updateVPNUI();updateEncUI();updateTabs();loadSliders();
+        closeModal('configModal');openModal('createModal');
     }
 
-    function activateConfig(i) {
-        showToast(`✅ Конфиг "${configs[i].name}" активирован`);
-        closeModal('configModal');
+    function selectVPN(v,el){selectedVPN=v;document.querySelectorAll('#createModal .vpn-option').forEach(function(b){b.classList.remove('selected')});el.classList.add('selected');}
+    function selectEnc(e,el){selectedEnc=e;var opts=document.querySelectorAll('#createModal .vpn-grid:last-child .vpn-option');opts.forEach(function(b){b.classList.remove('selected')});el.classList.add('selected');}
+    function updateVPNUI(){document.querySelectorAll('#createModal .vpn-option').forEach(function(b){if(b.textContent.toLowerCase().includes(selectedVPN))b.classList.add('selected');});}
+    function updateEncUI(){var opts=document.querySelectorAll('#createModal .vpn-grid:last-child .vpn-option');opts.forEach(function(b){if(b.textContent.toLowerCase().includes(selectedEnc))b.classList.add('selected');});}
+
+    function switchTab(i){saveSliders();activeTab=i;updateTabs();loadSliders();}
+    function updateTabs(){document.querySelectorAll('.button-tab').forEach(function(t,i){t.classList.toggle('active',i===activeTab);});}
+    function saveSliders(){btnSettings[activeTab]={clientDelay:parseInt(document.querySelectorAll('input[type=range]')[0].value),clientLoss:parseInt(document.querySelectorAll('input[type=range]')[1].value),serverDelay:parseInt(document.querySelectorAll('input[type=range]')[2].value),serverLoss:parseInt(document.querySelectorAll('input[type=range]')[3].value),timer:parseInt(document.querySelectorAll('input[type=range]')[4].value)};}
+    function loadSliders(){var s=btnSettings[activeTab];var sliders=document.querySelectorAll('input[type=range]');sliders[0].value=s.clientDelay;sliders[1].value=s.clientLoss;sliders[2].value=s.serverDelay;sliders[3].value=s.serverLoss;sliders[4].value=s.timer;document.getElementById('btnCD').textContent=s.clientDelay+' ms';document.getElementById('btnCL').textContent=s.clientLoss+'%';document.getElementById('btnSD').textContent=s.serverDelay+' ms';document.getElementById('btnSL').textContent=s.serverLoss+'%';document.getElementById('btnTimer').textContent=s.timer+' сек';}
+    function updateSlider(t){var v=parseInt(document.querySelectorAll('input[type=range]')[{'clientDelay':0,'clientLoss':1,'serverDelay':2,'serverLoss':3,'timer':4}[t]].value);document.getElementById('btn'+{'clientDelay':'CD','clientLoss':'CL','serverDelay':'SD','serverLoss':'SL','timer':'Timer'}[t]).textContent=(t=='timer'?v+' сек':(t.includes('Loss')?v+'%':v+' ms'));}
+
+    function saveConfig(){
+        saveSliders();
+        var name=document.getElementById('cfgName').value.trim(),creator=document.getElementById('cfgCreator').value.trim();
+        if(!name||!creator){showToast('❌ Заполните поля');return;}
+        var d={name:name,creator:creator,desc:document.getElementById('cfgDesc').value.trim(),vpn:selectedVPN,enc:selectedEnc,buttons:JSON.parse(JSON.stringify(btnSettings)),locked:selectedEnc==='free'};
+        if(editingIdx>=0){configs[editingIdx]=Object.assign(configs[editingIdx],d);showToast('✅ Обновлено');}else{configs.push(d);showToast('✅ Создано');}
+        localStorage.setItem('clumsy_cfg',JSON.stringify(configs));closeModal('createModal');renderConfigs();
     }
 
-    function editConfig(i) {
-        const c = configs[i]; editingIndex = i;
-        document.getElementById('editorTitle').textContent = 'Редактирование';
-        document.getElementById('cfgName').value = c.name;
-        document.getElementById('cfgCreator').value = c.creator;
-        document.getElementById('cfgDesc').value = c.desc || '';
-        selectedVPN = c.vpn; selectedEnc = c.enc;
-        updateVPNUI(); updateEncUI();
-        closeModal('configModal');
-        document.getElementById('createModal').classList.add('active');
+    function renderColors(){document.getElementById('colorGrid').innerHTML=colors.map(function(c){return '<div class="color-option'+(c===accentColor?' selected':'')+'" style="background:'+c+'" onclick="setColor(\''+c+'\',this)"></div>';}).join('');}
+    function setColor(c,el){accentColor=c;document.querySelectorAll('.color-option').forEach(function(b){b.classList.remove('selected')});el.classList.add('selected');applyColor();}
+    function saveCustom(){localStorage.setItem('clumsy_color',accentColor);applyColor();showToast('✨ Применено');closeModal('customModal');}
+    function applyColor(){document.querySelectorAll('.preview-btn,.floating-btn').forEach(function(b){b.style.background=accentColor;});}
+    applyColor();
+
+    function toggleSystem(){
+        systemActive=!systemActive;var btn=document.getElementById('startBtn');var panel=document.getElementById('floatingPanel');var badge=document.getElementById('statusBadge');
+        if(systemActive){btn.textContent='⏹ СТОП';btn.classList.add('stop');panel.classList.add('active');badge.innerHTML='● АКТИВЕН';showToast('✅ Запущено');}
+        else{btn.textContent='▶ ЗАПУСТИТЬ';btn.classList.remove('stop');panel.classList.remove('active');activeBtn=-1;badge.innerHTML='● ONLINE';showToast('❌ Остановлено');}
     }
 
-    function deleteConfig(i) {
-        configs.splice(i,1);
-        localStorage.setItem('clumsy_configs', JSON.stringify(configs));
-        renderConfigs();
-        showToast('🗑️ Удалено');
-    }
-
-    function openCreateModal() {
-        editingIndex = -1;
-        document.getElementById('editorTitle').textContent = 'Создание конфига';
-        document.getElementById('cfgName').value = '';
-        document.getElementById('cfgCreator').value = '';
-        document.getElementById('cfgDesc').value = '';
-        selectedVPN = 'pcapdroid'; selectedEnc = 'none';
-        updateVPNUI(); updateEncUI();
-        closeModal('configModal');
-        document.getElementById('createModal').classList.add('active');
-    }
-
-    function selectVPN(vpn, el) {
-        selectedVPN = vpn;
-        document.querySelectorAll('#createModal .vpn-opt').forEach(b => b.classList.remove('selected'));
-        el.classList.add('selected');
-    }
-
-    function selectEncryption(enc, el) {
-        selectedEnc = enc;
-        const opts = document.querySelectorAll('#createModal .vpn-grid:last-child .vpn-opt');
-        opts.forEach(b => b.classList.remove('selected'));
-        el.classList.add('selected');
-    }
-
-    function updateVPNUI() {
-        document.querySelectorAll('#createModal .vpn-opt').forEach(b => {
-            if (b.textContent.toLowerCase().includes(selectedVPN)) b.classList.add('selected');
-        });
-    }
-
-    function updateEncUI() {
-        const opts = document.querySelectorAll('#createModal .vpn-grid:last-child .vpn-opt');
-        opts.forEach(b => {
-            if (b.textContent.toLowerCase().includes(selectedEnc)) b.classList.add('selected');
-        });
-    }
-
-    function saveConfig() {
-        const name = document.getElementById('cfgName').value.trim();
-        const creator = document.getElementById('cfgCreator').value.trim();
-        if (!name || !creator) { showToast('❌ Заполните поля'); return; }
-        const data = {
-            name, creator,
-            desc: document.getElementById('cfgDesc').value.trim(),
-            vpn: selectedVPN, enc: selectedEnc,
-            locked: selectedEnc === 'free'
-        };
-        if (editingIndex >= 0) {
-            configs[editingIndex] = {...configs[editingIndex], ...data};
-            showToast('✅ Обновлено');
-        } else {
-            configs.push(data);
-            showToast('✅ Создано');
-        }
-        localStorage.setItem('clumsy_configs', JSON.stringify(configs));
-        closeModal('createModal');
-        renderConfigs();
-    }
-
-    function renderColors() {
-        document.getElementById('colorGrid').innerHTML = colors.map(c => 
-            `<div class="color-opt${c===accentColor?' selected':''}" style="background:${c}" onclick="setColor('${c}',this)"></div>`
-        ).join('');
-    }
-
-    function setColor(c, el) {
-        accentColor = c;
-        document.querySelectorAll('.color-opt').forEach(b => b.classList.remove('selected'));
-        el.classList.add('selected');
-        document.querySelectorAll('.pbtn').forEach(b => b.style.background = c);
-    }
-
-    function saveCustom() {
-        localStorage.setItem('clumsy_color', accentColor);
-        showToast('✨ Применено');
-        closeModal('customModal');
-    }
-
-    function toggleSystem() {
-        const btn = document.getElementById('startBtn');
-        const badge = document.getElementById('statusBadge');
-        if (btn.textContent.includes('ЗАПУСТИТЬ')) {
-            btn.textContent = '⏹ СТОП'; btn.classList.add('stop');
-            badge.innerHTML = '● АКТИВЕН'; badge.style.color = '#4ade80';
-            showToast('✅ Запущено');
-        } else {
-            btn.textContent = '▶ ЗАПУСТИТЬ'; btn.classList.remove('stop');
-            badge.innerHTML = '● ONLINE'; badge.style.color = '#4ade80';
-            showToast('❌ Остановлено');
+    function toggleFloatingBtn(i){
+        if(!systemActive)return;var btns=document.querySelectorAll('.floating-btn');
+        if(activeBtn==i){activeBtn=-1;btns[i].classList.remove('active-btn');showToast('Кнопка '+(i+1)+' выкл');}
+        else if(activeBtn==-1){activeBtn=i;btns.forEach(function(b,x){b.classList.toggle('active-btn',x==i);});showToast('Кнопка '+(i+1)+' вкл | 📥 '+btnSettings[i].clientDelay+'ms');
+            if(btnSettings[i].timer>0){setTimeout(function(){if(activeBtn==i){activeBtn=-1;btns[i].classList.remove('active-btn');showToast('⏰ Кнопка '+(i+1)+' автоотключена');}},btnSettings[i].timer*1000);}
         }
     }
 
-    const savedColor = localStorage.getItem('clumsy_color');
-    if (savedColor) { accentColor = savedColor; document.querySelectorAll('.pbtn').forEach(b => b.style.background = savedColor); }
+    // Drag floating panel
+    var dragX,dragY;
+    document.getElementById('floatingPanel').addEventListener('touchstart',function(e){dragX=e.touches[0].clientX-this.offsetLeft;dragY=e.touches[0].clientY-this.offsetTop;});
+    document.getElementById('floatingPanel').addEventListener('touchmove',function(e){e.preventDefault();this.style.left=(e.touches[0].clientX-dragX)+'px';this.style.top=(e.touches[0].clientY-dragY)+'px';});
 
-    document.querySelectorAll('.modal').forEach(m => {
-        m.addEventListener('click', function(e) { if (e.target === this) this.classList.remove('active'); });
-    });
+    document.querySelectorAll('.modal').forEach(function(m){m.addEventListener('click',function(e){if(e.target===this)this.classList.remove('active');});});
 </script>
 </body>
 </html>
