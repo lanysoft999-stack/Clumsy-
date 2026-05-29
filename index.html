@@ -6,286 +6,292 @@
     <title>Hesera Clumsy</title>
     <style>
         * { margin:0; padding:0; box-sizing:border-box; user-select:none; -webkit-tap-highlight-color:transparent; }
-        body { background:#06080e; font-family:'Segoe UI','Inter',system-ui,sans-serif; min-height:100vh; display:flex; align-items:center; justify-content:center; padding:16px; }
-        .menu-card { background:linear-gradient(160deg, rgba(13,16,23,0.98), rgba(8,10,16,0.98)); border-radius:24px; padding:28px 20px; border:1px solid rgba(255,255,255,0.05); width:100%; max-width:500px; }
-        .header { display:flex; justify-content:space-between; align-items:center; margin-bottom:24px; padding-bottom:14px; border-bottom:1px solid rgba(255,255,255,0.05); }
-        .app-name { font-size:20px; font-weight:800; color:white; }
-        .app-version { font-size:9px; color:#64748b; }
-        .status-badge { font-size:10px; background:rgba(34,197,94,0.12); padding:6px 12px; border-radius:20px; color:#4ade80; font-weight:700; }
-        .preview-area { background:rgba(6,8,13,0.8); border-radius:16px; padding:16px; margin-bottom:16px; text-align:center; }
-        .preview-title { font-size:9px; color:#64748b; text-transform:uppercase; letter-spacing:2px; margin-bottom:12px; }
-        .preview-buttons { display:flex; justify-content:center; gap:12px; }
-        .preview-btn { width:60px; height:60px; border-radius:18px; background:#3b82f6; }
-        .monitor { background:rgba(6,8,13,0.8); border-radius:16px; padding:16px; margin-bottom:24px; display:grid; grid-template-columns:1fr 1fr; gap:8px; }
-        .monitor-item { background:#0a0d14; border-radius:12px; padding:12px; text-align:center; }
-        .monitor-label { font-size:9px; color:#64748b; text-transform:uppercase; }
-        .monitor-value { font-size:18px; font-weight:800; color:#60a5fa; font-family:monospace; }
-        .monitor-value.off { color:#334155; }
-        .menu-buttons { display:flex; gap:8px; margin-bottom:24px; }
-        .menu-btn { flex:1; background:rgba(13,16,24,0.8); border:1px solid rgba(255,255,255,0.06); border-radius:16px; padding:16px 8px; text-align:center; cursor:pointer; color:#cbd5e1; font-weight:700; font-size:12px; }
-        .menu-btn .icon { font-size:24px; display:block; margin-bottom:4px; }
-        .start-btn { width:100%; background:linear-gradient(135deg, #3b82f6, #1d4ed8); border:none; border-radius:16px; padding:18px; font-size:16px; font-weight:800; color:white; cursor:pointer; text-transform:uppercase; letter-spacing:1px; margin-bottom:16px; }
-        .start-btn.stop { background:linear-gradient(135deg, #dc2626, #991b1b); }
-        .bottom-row { display:flex; gap:8px; }
-        .bottom-btn { flex:1; padding:12px; border:none; border-radius:12px; font-size:11px; font-weight:700; cursor:pointer; color:white; text-align:center; }
-        .btn-tg { background:#1e293b; }
-        .btn-report { background:rgba(239,68,68,0.15); color:#f87171; border:1px solid rgba(239,68,68,0.2); }
+        body {
+            background:#000; font-family:'Segoe UI','Inter',system-ui,sans-serif;
+            min-height:100vh; display:flex; align-items:center; justify-content:center;
+            padding:12px; position:relative; overflow:hidden;
+        }
+        canvas#bgCanvas { position:fixed; top:0; left:0; width:100%; height:100%; z-index:0; pointer-events:none; }
+        #app { position:relative; z-index:10; width:100%; max-width:500px; }
+        
+        .key-screen { position:fixed;top:0;left:0;width:100%;height:100%;z-index:99999;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.55); }
+        .key-screen.hidden { display:none; }
+        .key-card { background:rgba(10,10,10,0.92);border:1px solid rgba(99,140,246,0.2);border-radius:32px;padding:40px 28px;width:92%;max-width:440px;text-align:center; }
+        .key-icon { font-size:52px;margin-bottom:16px;color:#638cf6; }
+        .key-logo { font-size:26px;font-weight:900;color:#fff;margin-bottom:6px;letter-spacing:2px; }
+        .key-title { font-size:15px;font-weight:600;color:#94a3b8;margin-bottom:4px; }
+        .key-sub { font-size:12px;color:#555;margin-bottom:28px; }
+        .key-input { width:100%;background:#111;border:1px solid rgba(99,140,246,0.2);border-radius:60px;padding:16px 18px;font-size:15px;color:#fff;text-align:center;font-family:monospace;text-transform:uppercase;outline:none;margin-bottom:16px; }
+        .key-input:focus { border-color:#638cf6; }
+        .key-btn { width:100%;background:#638cf6;border:none;border-radius:60px;padding:16px;font-size:16px;font-weight:700;color:#fff;cursor:pointer;margin-bottom:16px;letter-spacing:1px; }
+        .key-btn:active { transform:scale(0.97); }
+        .key-error { color:#f87171;font-size:12px;display:none;margin-top:8px; }
+        .key-error.show { display:block; }
+        .key-link { font-size:11px;color:#555;margin-top:14px; } .key-link a { color:#638cf6; }
+        .timer-box { background:rgba(99,140,246,0.05);border:1px solid rgba(99,140,246,0.15);border-radius:14px;padding:14px;margin-bottom:16px;display:none; }
+        .timer-box.show { display:block; }
+        .timer-label { font-size:10px;color:#64748b;text-transform:uppercase;letter-spacing:2px;margin-bottom:6px; }
+        .timer-value { font-size:26px;font-weight:700;color:#638cf6;font-family:monospace; }
+        .timer-danger .timer-value { color:#ef4444; }
 
-        .modal { position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.95); z-index:1000; display:none; align-items:center; justify-content:center; padding:16px; }
-        .modal.active { display:flex; }
-        .modal-content { background:#0d1017; border-radius:20px; padding:24px; width:100%; max-width:460px; max-height:85vh; overflow-y:auto; }
-        .modal-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; }
-        .modal-title { font-size:18px; font-weight:800; color:white; }
-        .modal-close { background:#1e293b; border:none; color:white; width:32px; height:32px; border-radius:50%; cursor:pointer; font-size:16px; }
-        .form-group { margin-bottom:14px; }
-        .form-label { display:block; color:#94a3b8; font-size:11px; font-weight:600; margin-bottom:6px; text-transform:uppercase; letter-spacing:0.5px; }
-        .form-input { width:100%; background:#0a0d14; border:2px solid #1e293b; border-radius:12px; padding:12px 16px; font-size:14px; color:white; outline:none; }
-        .form-input:focus { border-color:#3b82f6; }
-        textarea.form-input { resize:vertical; min-height:80px; }
-        .vpn-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; margin-bottom:16px; }
-        .vpn-option { padding:12px 8px; background:rgba(10,13,20,0.8); border:2px solid #1e293b; border-radius:12px; color:#94a3b8; font-size:12px; font-weight:700; cursor:pointer; transition:0.2s; text-align:center; }
-        .vpn-option:hover { border-color:#3b82f6; color:white; }
-        .vpn-option.selected { border-color:#3b82f6; background:rgba(59,130,246,0.15); color:white; }
+        .menu-card { background:rgba(10,10,10,0.95);border-radius:28px;padding:28px 22px;border:1px solid rgba(255,255,255,0.04); }
+        .header { display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;padding-bottom:14px;border-bottom:1px solid rgba(255,255,255,0.04); }
+        .app-name { font-size:20px;font-weight:800;color:#fff; }
+        .status-badge { font-size:10px;background:rgba(99,140,246,0.1);padding:6px 14px;border-radius:18px;color:#638cf6;font-weight:600; }
+        .preview-area { background:#0d0d0d;border-radius:18px;padding:16px;margin-bottom:16px;text-align:center; }
+        .preview-title { font-size:10px;color:#555;text-transform:uppercase;letter-spacing:2px;margin-bottom:14px; }
+        .preview-buttons { display:flex;justify-content:center;gap:12px; }
+        .preview-btn { width:56px;height:56px;border-radius:16px;overflow:hidden; }
+        .preview-btn img { width:100%;height:100%;object-fit:cover; }
+        .monitor { background:#0d0d0d;border-radius:18px;padding:16px;margin-bottom:24px;display:grid;grid-template-columns:1fr 1fr;gap:8px; }
+        .monitor-item { background:#111;border-radius:12px;padding:12px;text-align:center; }
+        .monitor-label { font-size:9px;color:#555;text-transform:uppercase; }
+        .monitor-value { font-size:18px;font-weight:700;color:#638cf6;font-family:monospace; } .monitor-value.off { color:#222; }
+        .menu-buttons { display:flex;gap:8px;margin-bottom:24px; }
+        .menu-btn { flex:1;background:#111;border:1px solid rgba(255,255,255,0.04);border-radius:16px;padding:18px 10px;text-align:center;cursor:pointer;color:#94a3b8;font-weight:600;font-size:12px; }
+        .menu-btn:active { background:#1a1a1a; }
+        .menu-btn .icon { font-size:24px;display:block;margin-bottom:4px;color:#638cf6; }
+        .start-btn { width:100%;background:#638cf6;border:none;border-radius:18px;padding:18px;font-size:16px;font-weight:700;color:#fff;cursor:pointer;text-transform:uppercase;letter-spacing:2px;margin-bottom:16px; }
+        .start-btn:active { transform:scale(0.97); }
+        .start-btn.stop { background:#dc2626; }
+        .bottom-row { display:flex;gap:8px; }
+        .bottom-btn { flex:1;padding:12px;border:none;border-radius:12px;font-size:11px;font-weight:600;cursor:pointer;color:#fff;text-align:center; }
+        .btn-tg { background:#1a1a1a;color:#638cf6; }
+        .btn-report { background:rgba(239,68,68,0.08);color:#f87171;border:1px solid rgba(239,68,68,0.1); }
 
-        .button-tabs { display:flex; gap:8px; margin-bottom:16px; }
-        .button-tab { flex:1; padding:10px; background:rgba(10,13,20,0.8); border:2px solid #1e293b; border-radius:10px; color:#94a3b8; font-size:12px; font-weight:700; cursor:pointer; text-align:center; }
-        .button-tab.active { border-color:#3b82f6; background:rgba(59,130,246,0.15); color:white; }
-        .slider-group { margin-bottom:14px; }
-        .slider-label { display:flex; justify-content:space-between; color:#cbd5e1; font-size:12px; margin-bottom:6px; }
-        .slider-value { color:#60a5fa; font-family:monospace; font-weight:700; }
-        input[type="range"] { width:100%; height:4px; -webkit-appearance:none; background:#1e293b; border-radius:4px; outline:none; margin:12px 0; }
-        input[type="range"]::-webkit-slider-thumb { -webkit-appearance:none; width:18px; height:18px; background:#3b82f6; border-radius:50%; cursor:pointer; }
+        .buttons-panel { position:fixed;z-index:1500;display:none;background:rgba(10,10,10,0.95);border-radius:20px;padding:10px;cursor:grab;border:1px solid rgba(99,140,246,0.25); }
+        .buttons-panel.on { display:inline-flex; }
+        .buttons-row { display:flex;gap:8px; }
+        .panel-btn { width:56px;height:56px;border:none;border-radius:16px;cursor:pointer;overflow:hidden;position:relative;padding:0; }
+        .panel-btn img { width:100%;height:100%;object-fit:cover;position:absolute;top:0;left:0; }
+        .panel-btn:active { transform:scale(0.95); }
+        .panel-btn.active-effect { box-shadow:0 0 20px rgba(99,140,246,0.6);border:2px solid #638cf6; }
+        .panel-btn.disabled-effect { opacity:0.4;filter:grayscale(0.6); }
+        .watermark { position:fixed;top:0;left:0;width:100%;display:none;justify-content:center;z-index:1400;pointer-events:none;padding-top:12px; }
+        .watermark.on { display:flex; }
+        .watermark-text { font-size:14px;font-weight:600;color:rgba(99,140,246,0.1);text-transform:uppercase;letter-spacing:4px; }
 
-        .config-card { background:#111827; border:1px solid rgba(255,255,255,0.06); border-radius:12px; padding:14px; margin-bottom:8px; }
-        .config-name { font-size:14px; font-weight:700; color:white; }
-        .config-creator { font-size:11px; color:#94a3b8; margin-top:2px; }
-        .config-badges { display:flex; gap:4px; margin-top:6px; flex-wrap:wrap; }
-        .badge { font-size:9px; padding:4px 8px; border-radius:12px; font-weight:600; }
-        .badge-vpn { background:rgba(59,130,246,0.12); color:#60a5fa; }
-        .badge-open { background:rgba(34,197,94,0.12); color:#4ade80; }
-        .badge-locked { background:rgba(239,68,68,0.12); color:#f87171; }
-        .config-actions { display:flex; gap:6px; margin-top:10px; }
-        .config-btn { padding:8px 14px; border:none; border-radius:8px; font-size:11px; font-weight:700; cursor:pointer; color:white; }
-        .btn-edit { background:rgba(59,130,246,0.2); color:#60a5fa; }
-        .btn-delete { background:rgba(239,68,68,0.15); color:#f87171; }
-        .btn-activate { background:rgba(34,197,94,0.2); color:#4ade80; }
-
-        .color-grid { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:16px; }
-        .color-option { width:36px; height:36px; border-radius:10px; cursor:pointer; border:2px solid transparent; }
-        .color-option.selected { border-color:white; }
-
-        .save-btn { width:100%; background:linear-gradient(135deg, #3b82f6, #1d4ed8); border:none; border-radius:14px; padding:14px; font-size:16px; font-weight:700; color:white; cursor:pointer; margin-top:16px; }
-
-        .toast { position:fixed; bottom:30px; left:20px; right:20px; background:#1e293b; color:white; padding:14px; border-radius:14px; text-align:center; font-weight:600; font-size:13px; opacity:0; transition:0.3s; z-index:9999; pointer-events:none; }
+        .modal { position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.95);z-index:20000;display:flex;align-items:center;justify-content:center;padding:16px;opacity:0;visibility:hidden; }
+        .modal.active { opacity:1;visibility:visible; }
+        .modal-content { background:#0d0d0d;border-radius:24px;padding:24px;width:100%;max-width:520px;max-height:80vh;display:flex;flex-direction:column; }
+        .modal-header { display:flex;justify-content:space-between;align-items:center;margin-bottom:18px; }
+        .modal-title { font-size:18px;font-weight:700;color:#fff; }
+        .modal-close { background:#1a1a1a;border:none;color:#94a3b8;width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:16px; }
+        .config-scroll { flex:1;overflow-y:auto;margin-bottom:12px;min-height:0; }
+        .config-actions-bar { display:flex;gap:8px;padding-top:12px;border-top:1px solid rgba(255,255,255,0.04); }
+        .action-btn { flex:1;padding:10px;border-radius:10px;border:1px solid;cursor:pointer;font-size:11px;font-weight:600;text-align:center;background:transparent;color:#fff; }
+        .action-btn.export { border-color:rgba(99,140,246,0.2);color:#638cf6; }
+        .action-btn.import { border-color:rgba(139,92,246,0.2);color:#8b5cf6; }
+        .action-btn.add { border-color:rgba(99,140,246,0.2);color:#638cf6; }
+        .config-card { background:#111;border:1px solid rgba(255,255,255,0.03);border-radius:16px;padding:14px;margin-bottom:8px; }
+        .config-card::before { content:'';position:absolute;top:0;left:0;width:3px;height:100%;background:#638cf6;border-radius:3px 0 0 3px; }
+        .cfg-title { font-size:14px;font-weight:700;color:#fff; }
+        .cfg-creator { font-size:10px;color:#64748b; }
+        .cfg-badges { display:flex;gap:4px;margin-top:6px; }
+        .badge { font-size:9px;padding:3px 8px;border-radius:10px;font-weight:600; }
+        .badge-vpn { background:rgba(99,140,246,0.1);color:#638cf6; }
+        .cfg-actions { display:flex;gap:4px;margin-top:8px; }
+        .cfg-btn { padding:6px 12px;border-radius:8px;border:1px solid;cursor:pointer;font-size:10px;font-weight:600;color:#fff;background:transparent; }
+        .cfg-btn.activate { border-color:rgba(99,140,246,0.3);color:#638cf6; }
+        .cfg-btn.delete { border-color:rgba(239,68,68,0.3);color:#f87171; }
+        .empty-state { text-align:center;padding:30px;color:#555; }
+        .toast { position:fixed;bottom:20px;left:20px;right:20px;background:#1a1a1a;color:#fff;padding:12px;border-radius:10px;text-align:center;font-weight:600;font-size:12px;opacity:0;transition:0.3s;z-index:50000; }
         .toast.show { opacity:1; }
-
-        .floating-panel { position:fixed; z-index:9998; display:none; background:rgba(26,31,46,0.95); border-radius:16px; padding:10px; cursor:move; border:2px solid rgba(59,130,246,0.3); box-shadow:0 10px 30px rgba(0,0,0,0.5); touch-action:none; top:150px; left:50px; }
-        .floating-panel.active { display:flex; }
-        .floating-btn { width:55px; height:55px; border:none; border-radius:15px; cursor:pointer; margin:3px; font-size:14px; font-weight:bold; color:white; background:#3b82f6; opacity:0.5; transition:all 0.3s; }
-        .floating-btn.active-btn { opacity:1; background:#22c55e; box-shadow:0 0 15px rgba(34,197,94,0.5); }
+        .hidden { display:none; }
     </style>
 </head>
 <body>
+<canvas id="bgCanvas"></canvas>
 
-<div class="menu-card" id="mainMenu">
-    <div class="header">
-        <div><div class="app-name">Hesera Clumsy</div><div class="app-version">v3.0</div></div>
-        <div class="status-badge" id="statusBadge">● ONLINE</div>
+<div class="key-screen" id="keyScreen">
+    <div class="key-card">
+        <div class="key-icon">&#x25C8;</div>
+        <div class="key-logo">HESERA CLUMSY</div>
+        <div class="key-title">Access Key Required</div>
+        <div class="key-sub">Format: HESERA-XXXX-XXXX-7d</div>
+        <input type="text" class="key-input" id="licenseKey" placeholder="HESERA-XXXX-XXXX-7d" autocomplete="off" autocapitalize="characters">
+        <button class="key-btn" onclick="checkLicense()">ENTER</button>
+        <div class="key-error" id="keyError"></div>
+        <div class="timer-box" id="loginTimer"><div class="timer-label">Key Expires In</div><div class="timer-value" id="loginTimerValue">--:--:--</div></div>
+        <div class="key-link">Need a key? <a href="https://t.me/heseracfg" target="_blank">@heseracfg</a></div>
     </div>
-    
-    <div class="preview-area">
-        <div class="preview-title">📱 ПРЕДПРОСМОТР КНОПОК</div>
-        <div class="preview-buttons" id="previewButtons">
-            <div class="preview-btn"></div><div class="preview-btn"></div><div class="preview-btn"></div>
+</div>
+
+<div id="app" style="display:none;">
+    <div class="menu-card">
+        <div class="header"><div><div class="app-name">Hesera Clumsy</div></div><div class="status-badge">ONLINE</div></div>
+        <div class="preview-area"><div class="preview-title">Button Preview</div><div class="preview-buttons" id="previewButtons"></div></div>
+        <div class="monitor">
+            <div class="monitor-item"><div class="monitor-label">DL Delay</div><div class="monitor-value off" id="mCD">0ms</div></div>
+            <div class="monitor-item"><div class="monitor-label">UL Delay</div><div class="monitor-value off" id="mSD">0ms</div></div>
+            <div class="monitor-item"><div class="monitor-label">DL Loss</div><div class="monitor-value off" id="mCL">0%</div></div>
+            <div class="monitor-item"><div class="monitor-label">UL Loss</div><div class="monitor-value off" id="mSL">0%</div></div>
         </div>
-    </div>
-    
-    <div class="monitor">
-        <div class="monitor-item"><div class="monitor-label">📥 Задержка</div><div class="monitor-value off" id="mCD">0ms</div></div>
-        <div class="monitor-item"><div class="monitor-label">📤 Задержка</div><div class="monitor-value off" id="mSD">0ms</div></div>
-        <div class="monitor-item"><div class="monitor-label">📥 Потеря</div><div class="monitor-value off" id="mCL">0%</div></div>
-        <div class="monitor-item"><div class="monitor-label">📤 Потеря</div><div class="monitor-value off" id="mSL">0%</div></div>
-    </div>
-    
-    <div class="menu-buttons">
-        <div class="menu-btn" onclick="openModal('configModal')"><span class="icon">⚙️</span>Конфиг</div>
-        <div class="menu-btn" onclick="openModal('customModal')"><span class="icon">🎨</span>Кастом</div>
-    </div>
-    
-    <button class="start-btn" id="startBtn" onclick="toggleSystem()">▶ ЗАПУСТИТЬ</button>
-    
-    <div class="bottom-row">
-        <button class="bottom-btn btn-tg" onclick="window.open('https://t.me/hesers','_blank')">📱 Telegram</button>
-        <button class="bottom-btn btn-report" onclick="showToast('🚩 Жалоба отправлена')">🚩 Жалоба</button>
+        <div class="menu-buttons"><div class="menu-btn" onclick="openConfig()"><span class="icon">&#x2699;</span>Config</div><div class="menu-btn" onclick="openCustom()"><span class="icon">&#x25D0;</span>Custom</div></div>
+        <button class="start-btn" id="startBtn" onclick="toggleSystem()">START</button>
+        <div class="bottom-row"><button class="bottom-btn btn-tg" onclick="window.open('https://t.me/heseracfg','_blank')">Telegram</button><button class="bottom-btn btn-report" onclick="showToast('Report sent')">Report</button></div>
     </div>
 </div>
 
-<div class="floating-panel" id="floatingPanel">
-    <button class="floating-btn" onclick="toggleFloatingBtn(0)">⚡1</button>
-    <button class="floating-btn" onclick="toggleFloatingBtn(1)">⚡2</button>
-    <button class="floating-btn" onclick="toggleFloatingBtn(2)">⚡3</button>
-</div>
+<div class="watermark" id="watermark"><div class="watermark-text">HESERACFG</div></div>
 
 <div class="modal" id="configModal">
     <div class="modal-content">
-        <div class="modal-header"><div class="modal-title">⚙️ Конфигурация</div><button class="modal-close" onclick="closeModal('configModal')">✕</button></div>
-        <div id="configsList"></div>
-        <button class="save-btn" onclick="openCreateModal()">+ Создать конфиг</button>
-    </div>
-</div>
-
-<div class="modal" id="createModal">
-    <div class="modal-content">
-        <div class="modal-header"><div class="modal-title" id="editorTitle">Создание конфига</div><button class="modal-close" onclick="closeModal('createModal')">✕</button></div>
-        <div class="form-group"><label class="form-label">Название конфига</label><input class="form-input" id="cfgName" placeholder="Введите название"></div>
-        <div class="form-group"><label class="form-label">Имя создателя</label><input class="form-input" id="cfgCreator" placeholder="Введите имя"></div>
-        <div class="form-group"><label class="form-label">Описание</label><textarea class="form-input" id="cfgDesc" placeholder="Введите описание"></textarea></div>
-        
-        <div class="form-group"><label class="form-label">⚙️ Настройки кнопок</label>
-            <div class="button-tabs">
-                <button class="button-tab active" onclick="switchTab(0)">Кнопка 1</button>
-                <button class="button-tab" onclick="switchTab(1)">Кнопка 2</button>
-                <button class="button-tab" onclick="switchTab(2)">Кнопка 3</button>
-            </div>
-            <div class="slider-group">
-                <div class="slider-label"><span>📥 Задержка клиента</span><span class="slider-value" id="btnCD">0 ms</span></div>
-                <input type="range" min="0" max="8000" value="0" oninput="updateSlider('clientDelay')">
-            </div>
-            <div class="slider-group">
-                <div class="slider-label"><span>📥 Потеря клиента</span><span class="slider-value" id="btnCL">0%</span></div>
-                <input type="range" min="0" max="100" value="0" oninput="updateSlider('clientLoss')">
-            </div>
-            <div class="slider-group">
-                <div class="slider-label"><span>📤 Задержка сервера</span><span class="slider-value" id="btnSD">0 ms</span></div>
-                <input type="range" min="0" max="8000" value="0" oninput="updateSlider('serverDelay')">
-            </div>
-            <div class="slider-group">
-                <div class="slider-label"><span>📤 Потеря сервера</span><span class="slider-value" id="btnSL">0%</span></div>
-                <input type="range" min="0" max="100" value="0" oninput="updateSlider('serverLoss')">
-            </div>
-            <div class="slider-group">
-                <div class="slider-label"><span>⏱️ Таймер (сек)</span><span class="slider-value" id="btnTimer">0 сек</span></div>
-                <input type="range" min="0" max="300" value="0" oninput="updateSlider('timer')">
-            </div>
+        <div class="modal-header"><div class="modal-title">Configuration</div><button class="modal-close" onclick="closeModal('configModal')">&#x2715;</button></div>
+        <div class="config-scroll"><div id="configsList"></div></div>
+        <div class="config-actions-bar">
+            <button class="action-btn add" onclick="openCreateModal()">+ New</button>
         </div>
-        
-        <div class="form-group"><label class="form-label">Выберите VPN</label>
-            <div class="vpn-grid">
-                <div class="vpn-option selected" onclick="selectVPN('pcapdroid',this)">PcapDroid</div>
-                <div class="vpn-option" onclick="selectVPN('localvpn',this)">LocalVPN</div>
-                <div class="vpn-option" onclick="selectVPN('toyshark',this)">ToyShark</div>
-            </div>
-        </div>
-        <div class="form-group"><label class="form-label">Шифровка</label>
-            <div class="vpn-grid" style="grid-template-columns:1fr 1fr;">
-                <div class="vpn-option selected" onclick="selectEnc('none',this)">🔓 NONE</div>
-                <div class="vpn-option" onclick="selectEnc('free',this)">🔒 FREE</div>
-            </div>
-        </div>
-        <button class="save-btn" id="saveCfgBtn" onclick="saveConfig()">💾 Сохранить</button>
     </div>
 </div>
 
 <div class="modal" id="customModal">
     <div class="modal-content">
-        <div class="modal-header"><div class="modal-title">🎨 Кастомизация</div><button class="modal-close" onclick="closeModal('customModal')">✕</button></div>
-        <div class="form-group"><label class="form-label">Цвет кнопок</label><div class="color-grid" id="colorGrid"></div></div>
-        <button class="save-btn" onclick="saveCustom()">✨ Применить</button>
+        <div class="modal-header"><div class="modal-title">Customization</div><button class="modal-close" onclick="closeModal('customModal')">&#x2715;</button></div>
+        <div class="config-scroll">
+            <div class="preview-area"><div class="preview-title">Preview</div><div class="preview-buttons" id="customPreview"></div></div>
+            <div class="form-group"><div class="form-label" style="color:#94a3b8;font-size:10px;margin-bottom:6px;">Color</div><div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px;" id="colorGrid"></div></div>
+            <div class="form-group"><div class="form-label" style="color:#94a3b8;font-size:10px;margin-bottom:6px;">Scale</div><input type="range" id="scaleSlider" min="60" max="130" value="100" oninput="updateScale()" style="width:100%;"></div>
+        </div>
+        <div class="config-actions-bar"><button class="action-btn add" onclick="saveCustom()" style="flex:1;">Apply</button></div>
     </div>
 </div>
 
 <div class="toast" id="toast"></div>
 
 <script>
-    let configs = JSON.parse(localStorage.getItem('clumsy_cfg')||'[]');
-    let selectedVPN = 'pcapdroid', selectedEnc = 'none', editingIdx = -1, activeTab = 0;
-    let accentColor = localStorage.getItem('clumsy_color')||'#3b82f6';
-    let systemActive = false, activeBtn = -1;
-    let btnSettings = [
-        {clientDelay:0,clientLoss:0,serverDelay:0,serverLoss:0,timer:0},
-        {clientDelay:0,clientLoss:0,serverDelay:0,serverLoss:0,timer:0},
-        {clientDelay:0,clientLoss:0,serverDelay:0,serverLoss:0,timer:0}
-    ];
-    const colors = ['#3b82f6','#8b5cf6','#22c55e','#f59e0b','#ef4444','#ec4899'];
+// Canvas фон
+const canvas=document.getElementById('bgCanvas'),ctx=canvas.getContext('2d');
+let particles=[],mouseX=-1000,mouseY=-1000,touchActive=false;
+function resizeCanvas(){canvas.width=window.innerWidth;canvas.height=window.innerHeight;}
+resizeCanvas();window.addEventListener('resize',resizeCanvas);
+for(let i=0;i<70;i++){particles.push({x:Math.random()*canvas.width,y:Math.random()*canvas.height,vx:(Math.random()-0.5)*0.4,vy:(Math.random()-0.5)*0.4,size:Math.random()*2.5+0.5,alpha:Math.random()*0.4+0.1});}
+document.addEventListener('mousemove',function(e){mouseX=e.clientX;mouseY=e.clientY;touchActive=true;});
+document.addEventListener('touchmove',function(e){mouseX=e.touches[0].clientX;mouseY=e.touches[0].clientY;touchActive=true;});
+document.addEventListener('touchend',function(){touchActive=false;});
+function animate(){ctx.clearRect(0,0,canvas.width,canvas.height);ctx.fillStyle='#000';ctx.fillRect(0,0,canvas.width,canvas.height);particles.forEach(function(p){p.x+=p.vx;p.y+=p.vy;if(p.x<0||p.x>canvas.width)p.vx*=-1;if(p.y<0||p.y>canvas.height)p.vy*=-1;if(touchActive){var dx=mouseX-p.x,dy=mouseY-p.y,dist=Math.sqrt(dx*dx+dy*dy);if(dist<200&&dist>0){p.vx+=dx/dist*0.03;p.vy+=dy/dist*0.03;}}p.vx*=0.999;p.vy*=0.999;ctx.beginPath();ctx.arc(p.x,p.y,p.size,0,Math.PI*2);ctx.fillStyle='rgba(255,255,255,'+(p.alpha+0.2)+')';ctx.fill();});requestAnimationFrame(animate);}
+animate();
 
-    function showToast(m){var t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(function(){t.classList.remove('show')},2000);}
-    function openModal(id){document.getElementById(id).classList.add('active');if(id=='configModal')renderConfigs();if(id=='customModal')renderColors();}
-    function closeModal(id){document.getElementById(id).classList.remove('active');}
+// ============ ПРИЛОЖЕНИЕ (С ЗАГРУЗКОЙ КЛЮЧЕЙ С GITHUB) ============
+const ADMIN_KEYS = ['@hesers', '@heseracfg', 'HESERA-ADMIN'];
+const allIcons = ['https://i.postimg.cc/YqW4nrfW/IMG-20260528-093009.jpg','https://i.postimg.cc/8cR1XVm6/IMG-20260528-091848.jpg','https://i.postimg.cc/J4K8sx6j/IMG-20260528-082022.jpg'];
+const colors = ['#638cf6','#8b5cf6','#22c55e','#f59e0b','#ef4444','#ec4899'];
+const KEYS_URL = 'https://raw.githubusercontent.com/lanysoft999-stack/Clumsy-/main/keys.json';
 
-    function renderConfigs(){
-        var l=document.getElementById('configsList');
-        if(!configs.length){l.innerHTML='<p style="color:#64748b;text-align:center;padding:20px;">Нет конфигов</p>';return;}
-        l.innerHTML=configs.map(function(c,i){return '<div class="config-card"><div class="config-name">'+(c.enc==='free'?'🔒':'🔓')+' '+c.name+'</div><div class="config-creator">👤 '+c.creator+'</div><div class="config-badges"><span class="badge badge-vpn">📡 '+c.vpn+'</span><span class="badge '+(c.enc==='free'?'badge-locked':'badge-open')+'">'+(c.enc==='free'?'🔒 Закрытый':'🔓 Открытый')+'</span></div><div class="config-actions">'+(c.enc!=='free'?'<button class="config-btn btn-edit" onclick="editConfig('+i+')">✎</button>':'')+'<button class="config-btn btn-delete" onclick="deleteConfig('+i+')">✕</button><button class="config-btn btn-activate" onclick="activateConfig('+i+')">⚡</button></div></div>';}).join('');
-    }
+let serverKeys = [];
+let systemActive = false, activeBtn = -1;
+let accentColor = '#638cf6', panelScale = 100, btnCount = 3;
+let panelEl = null, panelActive = false, panelPos = {x:100,y:150};
+let btnIcons = [...allIcons];
+let cfgs = JSON.parse(localStorage.getItem('clumsy_cfg')||'[]');
+let btnSet = [{cD:0,cL:0,sD:0,sL:0,tm:0},{cD:0,cL:0,sD:0,sL:0,tm:0},{cD:0,cL:0,sD:0,sL:0,tm:0}];
 
-    function activateConfig(i){var c=configs[i];btnSettings=c.buttons||btnSettings;showToast('✅ Конфиг "'+c.name+'" активирован');closeModal('configModal');}
+function showToast(m){var t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(function(){t.classList.remove('show')},2000);}
+function $(id){return document.getElementById(id);}
 
-    function editConfig(i){
-        var c=configs[i];editingIdx=i;
-        document.getElementById('editorTitle').textContent='Редактирование';
-        document.getElementById('cfgName').value=c.name;document.getElementById('cfgCreator').value=c.creator;
-        document.getElementById('cfgDesc').value=c.desc||'';selectedVPN=c.vpn;selectedEnc=c.enc;
-        btnSettings=c.buttons||btnSettings;activeTab=0;
-        updateVPNUI();updateEncUI();updateTabs();loadSliders();
-        closeModal('configModal');openModal('createModal');
-    }
-
-    function deleteConfig(i){configs.splice(i,1);localStorage.setItem('clumsy_cfg',JSON.stringify(configs));renderConfigs();showToast('🗑️ Удалено');}
-
-    function openCreateModal(){
-        editingIdx=-1;document.getElementById('editorTitle').textContent='Создание конфига';
-        document.getElementById('cfgName').value='';document.getElementById('cfgCreator').value='';document.getElementById('cfgDesc').value='';
-        selectedVPN='pcapdroid';selectedEnc='none';btnSettings=[{clientDelay:0,clientLoss:0,serverDelay:0,serverLoss:0,timer:0},{clientDelay:0,clientLoss:0,serverDelay:0,serverLoss:0,timer:0},{clientDelay:0,clientLoss:0,serverDelay:0,serverLoss:0,timer:0}];
-        activeTab=0;updateVPNUI();updateEncUI();updateTabs();loadSliders();
-        closeModal('configModal');openModal('createModal');
-    }
-
-    function selectVPN(v,el){selectedVPN=v;document.querySelectorAll('#createModal .vpn-option').forEach(function(b){b.classList.remove('selected')});el.classList.add('selected');}
-    function selectEnc(e,el){selectedEnc=e;var opts=document.querySelectorAll('#createModal .vpn-grid:last-child .vpn-option');opts.forEach(function(b){b.classList.remove('selected')});el.classList.add('selected');}
-    function updateVPNUI(){document.querySelectorAll('#createModal .vpn-option').forEach(function(b){if(b.textContent.toLowerCase().includes(selectedVPN))b.classList.add('selected');});}
-    function updateEncUI(){var opts=document.querySelectorAll('#createModal .vpn-grid:last-child .vpn-option');opts.forEach(function(b){if(b.textContent.toLowerCase().includes(selectedEnc))b.classList.add('selected');});}
-
-    function switchTab(i){saveSliders();activeTab=i;updateTabs();loadSliders();}
-    function updateTabs(){document.querySelectorAll('.button-tab').forEach(function(t,i){t.classList.toggle('active',i===activeTab);});}
-    function saveSliders(){btnSettings[activeTab]={clientDelay:parseInt(document.querySelectorAll('input[type=range]')[0].value),clientLoss:parseInt(document.querySelectorAll('input[type=range]')[1].value),serverDelay:parseInt(document.querySelectorAll('input[type=range]')[2].value),serverLoss:parseInt(document.querySelectorAll('input[type=range]')[3].value),timer:parseInt(document.querySelectorAll('input[type=range]')[4].value)};}
-    function loadSliders(){var s=btnSettings[activeTab];var sliders=document.querySelectorAll('input[type=range]');sliders[0].value=s.clientDelay;sliders[1].value=s.clientLoss;sliders[2].value=s.serverDelay;sliders[3].value=s.serverLoss;sliders[4].value=s.timer;document.getElementById('btnCD').textContent=s.clientDelay+' ms';document.getElementById('btnCL').textContent=s.clientLoss+'%';document.getElementById('btnSD').textContent=s.serverDelay+' ms';document.getElementById('btnSL').textContent=s.serverLoss+'%';document.getElementById('btnTimer').textContent=s.timer+' сек';}
-    function updateSlider(t){var v=parseInt(document.querySelectorAll('input[type=range]')[{'clientDelay':0,'clientLoss':1,'serverDelay':2,'serverLoss':3,'timer':4}[t]].value);document.getElementById('btn'+{'clientDelay':'CD','clientLoss':'CL','serverDelay':'SD','serverLoss':'SL','timer':'Timer'}[t]).textContent=(t=='timer'?v+' сек':(t.includes('Loss')?v+'%':v+' ms'));}
-
-    function saveConfig(){
-        saveSliders();
-        var name=document.getElementById('cfgName').value.trim(),creator=document.getElementById('cfgCreator').value.trim();
-        if(!name||!creator){showToast('❌ Заполните поля');return;}
-        var d={name:name,creator:creator,desc:document.getElementById('cfgDesc').value.trim(),vpn:selectedVPN,enc:selectedEnc,buttons:JSON.parse(JSON.stringify(btnSettings)),locked:selectedEnc==='free'};
-        if(editingIdx>=0){configs[editingIdx]=Object.assign(configs[editingIdx],d);showToast('✅ Обновлено');}else{configs.push(d);showToast('✅ Создано');}
-        localStorage.setItem('clumsy_cfg',JSON.stringify(configs));closeModal('createModal');renderConfigs();
-    }
-
-    function renderColors(){document.getElementById('colorGrid').innerHTML=colors.map(function(c){return '<div class="color-option'+(c===accentColor?' selected':'')+'" style="background:'+c+'" onclick="setColor(\''+c+'\',this)"></div>';}).join('');}
-    function setColor(c,el){accentColor=c;document.querySelectorAll('.color-option').forEach(function(b){b.classList.remove('selected')});el.classList.add('selected');applyColor();}
-    function saveCustom(){localStorage.setItem('clumsy_color',accentColor);applyColor();showToast('✨ Применено');closeModal('customModal');}
-    function applyColor(){document.querySelectorAll('.preview-btn,.floating-btn').forEach(function(b){b.style.background=accentColor;});}
-    applyColor();
-
-    function toggleSystem(){
-        systemActive=!systemActive;var btn=document.getElementById('startBtn');var panel=document.getElementById('floatingPanel');var badge=document.getElementById('statusBadge');
-        if(systemActive){btn.textContent='⏹ СТОП';btn.classList.add('stop');panel.classList.add('active');badge.innerHTML='● АКТИВЕН';showToast('✅ Запущено');}
-        else{btn.textContent='▶ ЗАПУСТИТЬ';btn.classList.remove('stop');panel.classList.remove('active');activeBtn=-1;badge.innerHTML='● ONLINE';showToast('❌ Остановлено');}
-    }
-
-    function toggleFloatingBtn(i){
-        if(!systemActive)return;var btns=document.querySelectorAll('.floating-btn');
-        if(activeBtn==i){activeBtn=-1;btns[i].classList.remove('active-btn');showToast('Кнопка '+(i+1)+' выкл');}
-        else if(activeBtn==-1){activeBtn=i;btns.forEach(function(b,x){b.classList.toggle('active-btn',x==i);});showToast('Кнопка '+(i+1)+' вкл | 📥 '+btnSettings[i].clientDelay+'ms');
-            if(btnSettings[i].timer>0){setTimeout(function(){if(activeBtn==i){activeBtn=-1;btns[i].classList.remove('active-btn');showToast('⏰ Кнопка '+(i+1)+' автоотключена');}},btnSettings[i].timer*1000);}
+// Загрузка ключей с сервера
+async function loadKeysFromServer() {
+    try {
+        var response = await fetch(KEYS_URL + '?t=' + Date.now());
+        if (!response.ok) throw new Error('Failed to load keys');
+        var data = await response.json();
+        if (data.keys) {
+            serverKeys = data.keys;
+            console.log('Keys loaded from server: ' + serverKeys.length);
         }
+    } catch(e) {
+        console.log('Could not load keys from server, using local');
+        serverKeys = JSON.parse(localStorage.getItem('hesera_keys') || '[]');
     }
+}
 
-    // Drag floating panel
-    var dragX,dragY;
-    document.getElementById('floatingPanel').addEventListener('touchstart',function(e){dragX=e.touches[0].clientX-this.offsetLeft;dragY=e.touches[0].clientY-this.offsetTop;});
-    document.getElementById('floatingPanel').addEventListener('touchmove',function(e){e.preventDefault();this.style.left=(e.touches[0].clientX-dragX)+'px';this.style.top=(e.touches[0].clientY-dragY)+'px';});
+function checkLicense(){
+    var k=$('licenseKey').value.trim().toUpperCase(),e=$('keyError');e.textContent='';e.classList.remove('show');
+    if(!k){e.textContent='Enter key';e.classList.add('show');return;}
+    
+    // Проверка админ-ключей
+    if(ADMIN_KEYS.includes(k)){grantAccess();return;}
+    
+    // Проверка ключей с сервера
+    var found = serverKeys.find(function(x){return x.key===k && !x.revoked;});
+    if(found){grantAccess();return;}
+    
+    // Проверка локальных ключей
+    var localKeys = JSON.parse(localStorage.getItem('hesera_keys')||'[]');
+    var localFound = localKeys.find(function(x){return x.key===k && !x.revoked;});
+    if(localFound){grantAccess();return;}
+    
+    // Проверка формата HESERA-
+    if(!k.startsWith('HESERA-')){e.textContent='Invalid format';e.classList.add('show');return;}
+    var p=k.split('-'),last=p[p.length-1];
+    if(last==='FOREVER'){grantAccess();return;}
+    if(last.match(/^\d+[mhd]$/)){grantAccess();return;}
+    
+    e.textContent='Invalid key';e.classList.add('show');
+}
 
-    document.querySelectorAll('.modal').forEach(function(m){m.addEventListener('click',function(e){if(e.target===this)this.classList.remove('active');});});
+function grantAccess(){$('keyScreen').classList.add('hidden');$('app').style.display='block';updatePreview();renderColors();showToast('Access granted');}
+
+function openConfig(){$('configModal').classList.add('active');renderConfigs();}
+function openCustom(){$('customModal').classList.add('active');renderCustomPreview();renderColors();}
+function closeModal(id){$(id).classList.remove('active');}
+function openCreateModal(){
+    var n=prompt('Config name:');if(!n)return;
+    var c=prompt('Creator:');if(!c)return;
+    var v=prompt('VPN (pcapdroid/localvpn/toyshark):')||'pcapdroid';
+    cfgs.push({name:n,creator:c,vpn:v});
+    localStorage.setItem('clumsy_cfg',JSON.stringify(cfgs));renderConfigs();showToast('Config created');
+}
+function renderConfigs(){
+    var l=$('configsList');
+    if(!cfgs.length){l.innerHTML='<div class="empty-state"><p>No configs</p></div>';return;}
+    l.innerHTML=cfgs.map(function(c,i){return'<div class="config-card"><div class="cfg-title">'+c.name+'</div><div class="cfg-creator">by '+c.creator+'</div><div class="cfg-badges"><span class="badge badge-vpn">'+c.vpn+'</span></div><div class="cfg-actions"><button class="cfg-btn activate" onclick="activateCfg('+i+')">Activate</button><button class="cfg-btn delete" onclick="delCfg('+i+')">Del</button></div></div>';}).join('');
+}
+function activateCfg(i){var c=cfgs[i];btnSet=c.buttons||btnSet;showToast('Activated: '+c.name);closeModal('configModal');}
+function delCfg(i){cfgs.splice(i,1);localStorage.setItem('clumsy_cfg',JSON.stringify(cfgs));renderConfigs();showToast('Deleted');}
+
+function renderCustomPreview(){var c=$('customPreview');c.innerHTML=btnIcons.slice(0,btnCount).map(function(icon){return'<div class="preview-btn" style="background:'+accentColor+';"><img src="'+icon+'"></div>';}).join('');}
+function renderColors(){var g=$('colorGrid');g.innerHTML=colors.map(function(c){return'<div style="width:28px;height:28px;border-radius:8px;background:'+c+';cursor:pointer;border:2px solid '+(c===accentColor?'white':'transparent')+';" onclick="setColor(\''+c+'\',this)"></div>';}).join('');}
+function setColor(c,el){accentColor=c;renderColors();renderCustomPreview();}
+function updateScale(){panelScale=parseInt($('scaleSlider').value);renderCustomPreview();}
+function saveCustom(){updateScale();if(panelActive)recreatePanel();updatePreview();showToast('Applied');closeModal('customModal');}
+
+function createPanel(){
+    if(panelEl)panelEl.remove();
+    var panel=document.createElement('div');panel.className='buttons-panel on';
+    panel.style.left=panelPos.x+'px';panel.style.top=panelPos.y+'px';panel.style.transform='scale('+(panelScale/100)+')';
+    var row=document.createElement('div');row.className='buttons-row';
+    for(var i=0;i<btnCount;i++){
+        var btn=document.createElement('button');btn.className='panel-btn disabled-effect';btn.style.background=accentColor;
+        var img=document.createElement('img');img.src=btnIcons[i]||allIcons[0];img.style.pointerEvents='none';btn.appendChild(img);
+        (function(idx){btn.addEventListener('click',function(e){e.stopPropagation();if(!systemActive)return;
+            if(activeBtn===idx){activeBtn=-1;updateAllBtnStyles();showToast('Btn '+(idx+1)+' off');}
+            else if(activeBtn===-1){activeBtn=idx;updateAllBtnStyles();showToast('Btn '+(idx+1)+' on');}
+            else{showToast('Turn off btn '+(activeBtn+1)+' first');}
+        });})(i);
+        row.appendChild(btn);
+    }
+    panel.appendChild(row);
+    var sx,sy,sl,st;
+    panel.addEventListener('touchstart',function(e){var t=e.touches[0];sx=t.clientX;sy=t.clientY;sl=panelPos.x;st=panelPos.y;panel.style.transition='none';});
+    panel.addEventListener('touchmove',function(e){var t=e.touches[0];panelPos.x=Math.min(window.innerWidth-80,Math.max(0,sl+t.clientX-sx));panelPos.y=Math.min(window.innerHeight-80,Math.max(0,st+t.clientY-sy));panel.style.left=panelPos.x+'px';panel.style.top=panelPos.y+'px';});
+    panel.addEventListener('touchend',function(){panel.style.transition='0.2s';});
+    document.body.appendChild(panel);panelEl=panel;updateAllBtnStyles();
+}
+function updateAllBtnStyles(){if(!panelEl)return;panelEl.querySelectorAll('.panel-btn').forEach(function(b,i){b.classList.remove('active-effect','disabled-effect');b.classList.add(systemActive&&activeBtn===i?'active-effect':'disabled-effect');});}
+function removePanel(){if(panelEl){panelEl.remove();panelEl=null;}panelActive=false;activeBtn=-1;}
+function recreatePanel(){if(panelActive){removePanel();createPanel();}}
+
+function toggleSystem(){
+    systemActive=!systemActive;var btn=$('startBtn'),badge=$('statusBadge'),wm=$('watermark');
+    if(systemActive){activeBtn=-1;btn.textContent='STOP';btn.classList.add('stop');createPanel();panelActive=true;badge.innerHTML='ACTIVE';wm.classList.add('on');showToast('System started');}
+    else{btn.textContent='START';btn.classList.remove('stop');removePanel();badge.innerHTML='ONLINE';wm.classList.remove('on');showToast('System stopped');}
+}
+function updatePreview(){var c=$('previewButtons');if(!c)return;c.innerHTML=btnIcons.slice(0,btnCount).map(function(icon){return'<div class="preview-btn" style="background:'+accentColor+';"><img src="'+icon+'"></div>';}).join('');}
+
+// Загружаем ключи при старте
+loadKeysFromServer().then(function(){console.log('Keys ready');});
+updatePreview();
 </script>
 </body>
-</html>
+</html>я
