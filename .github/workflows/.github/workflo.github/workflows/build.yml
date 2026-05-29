@@ -1,0 +1,20 @@
+name: Build APK
+on: push
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Upload HTML as APK
+        run: |
+          mkdir -p app/src/main/assets
+          cp index.html app/src/main/assets/
+          echo "HTML готов"
+      - name: Create ZIP
+        run: |
+          zip -r clumsy-app.zip app/
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: Clumsy-App
+          path: clumsy-app.zip
