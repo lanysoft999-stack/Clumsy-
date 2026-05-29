@@ -1,0 +1,16 @@
+name: Build
+on: push
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Package
+        run: |
+          mkdir -p app/src/main/assets
+          cp index.html app/src/main/assets/
+          zip -r Clumsy.zip app/
+      - uses: actions/upload-artifact@v3
+        with:
+          name: Clumsy
+          path: Clumsy.zip
