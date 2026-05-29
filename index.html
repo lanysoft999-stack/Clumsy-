@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Hesera Clumsy</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; user-select:none; }
+        body { background:#06080e; font-family:'Segoe UI',system-ui,sans-serif; color:white; padding:16px; }
+        .app { max-width:500px; margin:0 auto; }
+        .header { display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; padding-bottom:15px; border-bottom:1px solid rgba(255,255,255,0.05); }
+        .app-name { font-size:20px; font-weight:800; }
+        .status { font-size:10px; background:rgba(34,197,94,0.12); padding:8px 14px; border-radius:20px; color:#4ade80; }
+        .card { background:#0d1017; border-radius:16px; padding:20px; margin-bottom:16px; border:1px solid rgba(255,255,255,0.04); }
+        .card-title { font-size:10px; color:#64748b; text-transform:uppercase; letter-spacing:2px; margin-bottom:14px; text-align:center; }
+        .preview-btns { display:flex; justify-content:center; gap:10px; }
+        .pbtn { width:55px; height:55px; border-radius:15px; background:#3b82f6; }
+        .monitor { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+        .mon { background:#0a0d14; border-radius:10px; padding:12px; text-align:center; }
+        .mon-label { font-size:9px; color:#64748b; }
+        .mon-value { font-size:16px; font-weight:800; color:#60a5fa; font-family:monospace; }
+        .menu-row { display:flex; gap:8px; margin-bottom:16px; }
+        .menu-btn { flex:1; background:#111; border:1px solid rgba(255,255,255,0.06); border-radius:14px; padding:16px; text-align:center; cursor:pointer; font-size:12px; font-weight:700; color:#cbd5e1; }
+        .menu-btn:active { background:#1a1f2e; }
+        .menu-btn .icon { font-size:24px; display:block; margin-bottom:4px; }
+        .start-btn { width:100%; background:#3b82f6; border:none; border-radius:14px; padding:18px; font-size:16px; font-weight:800; color:white; cursor:pointer; margin-bottom:12px; }
+        .start-btn.stop { background:#dc2626; }
+        .bottom-row { display:flex; gap:8px; }
+        .bottom-btn { flex:1; padding:14px; border:none; border-radius:12px; font-size:11px; font-weight:700; cursor:pointer; color:white; }
+        .btn-tg { background:#1e293b; }
+        .modal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.95); z-index:1000; padding:20px; overflow-y:auto; }
+        .modal.active { display:flex; align-items:center; justify-content:center; }
+        .modal-content { background:#0d1017; border-radius:20px; padding:24px; width:100%; max-width:450px; max-height:85vh; overflow-y:auto; }
+        .modal-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; }
+        .modal-title { font-size:18px; font-weight:800; }
+        .modal-close { background:#1e293b; border:none; color:white; width:32px; height:32px; border-radius:50%; cursor:pointer; font-size:16px; }
+        .form-group { margin-bottom:14px; }
+        .form-label { display:block; color:#94a3b8; font-size:11px; font-weight:600; margin-bottom:6px; text-transform:uppercase; }
+        .form-input { width:100%; background:#0a0d14; border:2px solid #1e293b; border-radius:10px; padding:12px; font-size:14px; color:white; outline:none; }
+        .form-input:focus { border-color:#3b82f6; }
+        .vpn-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:6px; margin-bottom:14px; }
+        .vpn-opt { padding:12px 6px; background:#0a0d14; border:2px solid #1e293b; border-radius:10px; color:#94a3b8; font-size:11px; font-weight:700; cursor:pointer; text-align:center; }
+        .vpn-opt.selected { border-color:#3b82f6; background:rgba(59,130,246,0.15); color:white; }
+        .save-btn { width:100%; background:#3b82f6; border:none; border-radius:12px; padding:14px; font-size:15px; font-weight:700; color:white; cursor:pointer; margin-top:16px; }
+        .config-card { background:#111827; border:1px solid rgba(255,255,255,0.06); border-radius:12px; padding:14px; margin-bottom:8px; }
+        .config-name { font-size:14px; font-weight:700; }
+        .config-creator { font-size:11px; color:#94a3b8; margin-top:2px; }
+        .config-badges { display:flex; gap:4px; margin-top:6px; }
+        .badge { font-size:9px; padding:4px 8px; border-radius:12px; background:rgba(59,130,246,0.12); color:#60a5fa; }
+        .config-actions { display:flex; gap:6px; margin-top:10px; }
+        .config-btn { padding:8px 14px; border:none; border-radius:8px; font-size:11px; font-weight:700; cursor:pointer; }
+        .btn-edit { background:rgba(59,130,246,0.2); color:#60a5fa; }
+        .btn-delete { background:rgba(239,68,68,0.15); color:#f87171; }
+        .btn-activate { background:rgba(34,197,94,0.2); color:#4ade80; }
+        .color-grid { display:flex; gap:6px; flex-wrap:wrap; margin-bottom:12px; }
+        .color-opt { width:32px; height:32px; border-radius:8px; cursor:pointer; border:2px solid transparent; }
+        .color-opt.selected { border-color:white; }
+        .toast { position:fixed; bottom:30px; left:20px; right:20px; background:#1e293b; padding:14px; border-radius:12px; text-align:center; font-weight:600; font-size:13px; opacity:0; transition:0.3s; z-index:9999; pointer-events:none; }
+        .toast.show { opacity:1; }
+    </style>
+</head>
+<body>
+
+<div class="app">
+    <div class="header">
+        <div><div class="app-name">Hesera Clumsy</div></div>
+        <div class="status" id="statusBadge">● ONLINE</div>
+    </div>
+    
+    <div class="card">
+        <div class="card-title">📱 ПРЕДПРОСМОТР КНОПОК</div>
+        <div class="preview-btns"><div class="pbtn"></div><div class="pbtn"></div><div class="pbtn"></div></div>
+    </div>
+    
+    <div class="card">
+        <div class="monitor">
+            <div class="mon"><div class="mon-label">📥 Задержка</div><div class="mon-value" id="mCD">0ms</div></div>
+            <div class="mon"><div class="mon-label">📤 Задержка</div><div class="mon-value" id="mSD">0ms</div></div>
+            <div class="mon"><div class="mon-label">📥 Потеря</div><div class="mon-value" id="mCL">0%</div></div>
+            <div class="mon"><div class="mon-label">📤 Потеря</div><div class="mon-value" id="mSL">0%</div></div>
+        </div>
+    </div>
+    
+    <div class="menu-row">
+        <div class="menu-btn" onclick="openModal('configModal')"><span class="icon">⚙️</span>Конфиг</div>
+        <div class="menu-btn" onclick="openModal('customModal')"><span class="icon">🎨</span>Кастом</div>
+    </div>
+    
+    <button class="start-btn" id="startBtn" onclick="toggleSystem()">▶ ЗАПУСТИТЬ</button>
+    
+    <div class="bottom-row">
+        <button class="bottom-btn btn-tg" onclick="window.open('https://t.me/hesers','_blank')">📱 Telegram</button>
+        <button class="bottom-btn" onclick="showToast('🚩 Жалоба отправлена')" style="background:rgba(239,68,68,0.15);color:#f87171;border:1px solid rgba(239,68,68,0.2);">🚩 Жалоба</button>
+    </div>
+</div>
+
+<div class="modal" id="configModal">
+    <div class="modal-content">
+        <div class="modal-header"><div class="modal-title">⚙️ Конфигурация</div><button class="modal-close" onclick="closeModal('configModal')">✕</button></div>
+        <div id="configsList"></div>
+        <button class="save-btn" onclick="openCreateModal()">+ Создать конфиг</button>
+    </div>
+</div>
+
+<div class="modal" id="createModal">
+    <div class="modal-content">
+        <div class="modal-header"><div class="modal-title" id="editorTitle">Создание конфига</div><button class="modal-close" onclick="closeModal('createModal')">✕</button></div>
+        <div class="form-group"><label class="form-label">Название</label><input class="form-input" id="cfgName" placeholder="Введите название"></div>
+        <div class="form-group"><label class="form-label">Создатель</label><input class="form-input" id="cfgCreator" placeholder="Введите имя"></div>
+        <div class="form-group"><label class="form-label">Описание</label><input class="form-input" id="cfgDesc" placeholder="Описание"></div>
+        <div class="form-group"><label class="form-label">VPN</label>
+            <div class="vpn-grid">
+                <div class="vpn-opt selected" onclick="selectVPN('pcapdroid',this)">PcapDroid</div>
+                <div class="vpn-opt" onclick="selectVPN('localvpn',this)">LocalVPN</div>
+                <div class="vpn-opt" onclick="selectVPN('toyshark',this)">ToyShark</div>
+            </div>
+        </div>
+        <div class="form-group"><label class="form-label">Шифровка</label>
+            <div class="vpn-grid" style="grid-template-columns:1fr 1fr;">
+                <div class="vpn-opt selected" onclick="selectEncryption('none',this)">🔓 NONE</div>
+                <div class="vpn-opt" onclick="selectEncryption('free',this)">🔒 FREE</div>
+            </div>
+        </div>
+        <button class="save-btn" id="saveCfgBtn" onclick="saveConfig()">💾 Сохранить</button>
+    </div>
+</div>
+
+<div class="modal" id="customModal">
+    <div class="modal-content">
+        <div class="modal-header"><div class="modal-title">🎨 Кастомизация</div><button class="modal-close" onclick="closeModal('customModal')">✕</button></div>
+        <div class="form-group"><label class="form-label">Цвет кнопок</label><div class="color-grid" id="colorGrid"></div></div>
+        <button class="save-btn" onclick="saveCustom()">✨ Применить</button>
+    </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+    let configs = JSON.parse(localStorage.getItem('clumsy_configs') || '[]');
+    let selectedVPN = 'pcapdroid', selectedEnc = 'none', editingIndex = -1;
+    let accentColor = '#3b82f6';
+    const colors = ['#3b82f6','#8b5cf6','#22c55e','#f59e0b','#ef4444','#ec4899'];
+
+    function showToast(msg) {
+        const t = document.getElementById('toast');
+        t.textContent = msg; t.classList.add('show');
+        setTimeout(() => t.classList.remove('show'), 2000);
+    }
+
+    function openModal(id) {
+        document.getElementById(id).classList.add('active');
+        if (id === 'configModal') renderConfigs();
+        if (id === 'customModal') renderColors();
+    }
+
+    function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+
+    function renderConfigs() {
+        const list = document.getElementById('configsList');
+        if (!configs.length) { list.innerHTML = '<p style="color:#64748b;text-align:center;padding:20px;">Нет конфигов</p>'; return; }
+        list.innerHTML = configs.map((c,i) => `
+            <div class="config-card">
+                <div class="config-name">${c.enc==='free'?'🔒':'🔓'} ${c.name}</div>
+                <div class="config-creator">👤 ${c.creator}</div>
+                <div class="config-badges"><span class="badge">📡 ${c.vpn}</span></div>
+                <div class="config-actions">
+                    ${c.enc!=='free'?`<button class="config-btn btn-edit" onclick="editConfig(${i})">✎</button>`:''}
+                    <button class="config-btn btn-delete" onclick="deleteConfig(${i})">✕</button>
+                    <button class="config-btn btn-activate" onclick="activateConfig(${i})">⚡</button>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    function activateConfig(i) {
+        showToast(`✅ Конфиг "${configs[i].name}" активирован`);
+        closeModal('configModal');
+    }
+
+    function editConfig(i) {
+        const c = configs[i]; editingIndex = i;
+        document.getElementById('editorTitle').textContent = 'Редактирование';
+        document.getElementById('cfgName').value = c.name;
+        document.getElementById('cfgCreator').value = c.creator;
+        document.getElementById('cfgDesc').value = c.desc || '';
+        selectedVPN = c.vpn; selectedEnc = c.enc;
+        updateVPNUI(); updateEncUI();
+        closeModal('configModal');
+        document.getElementById('createModal').classList.add('active');
+    }
+
+    function deleteConfig(i) {
+        configs.splice(i,1);
+        localStorage.setItem('clumsy_configs', JSON.stringify(configs));
+        renderConfigs();
+        showToast('🗑️ Удалено');
+    }
+
+    function openCreateModal() {
+        editingIndex = -1;
+        document.getElementById('editorTitle').textContent = 'Создание конфига';
+        document.getElementById('cfgName').value = '';
+        document.getElementById('cfgCreator').value = '';
+        document.getElementById('cfgDesc').value = '';
+        selectedVPN = 'pcapdroid'; selectedEnc = 'none';
+        updateVPNUI(); updateEncUI();
+        closeModal('configModal');
+        document.getElementById('createModal').classList.add('active');
+    }
+
+    function selectVPN(vpn, el) {
+        selectedVPN = vpn;
+        document.querySelectorAll('#createModal .vpn-opt').forEach(b => b.classList.remove('selected'));
+        el.classList.add('selected');
+    }
+
+    function selectEncryption(enc, el) {
+        selectedEnc = enc;
+        const opts = document.querySelectorAll('#createModal .vpn-grid:last-child .vpn-opt');
+        opts.forEach(b => b.classList.remove('selected'));
+        el.classList.add('selected');
+    }
+
+    function updateVPNUI() {
+        document.querySelectorAll('#createModal .vpn-opt').forEach(b => {
+            if (b.textContent.toLowerCase().includes(selectedVPN)) b.classList.add('selected');
+        });
+    }
+
+    function updateEncUI() {
+        const opts = document.querySelectorAll('#createModal .vpn-grid:last-child .vpn-opt');
+        opts.forEach(b => {
+            if (b.textContent.toLowerCase().includes(selectedEnc)) b.classList.add('selected');
+        });
+    }
+
+    function saveConfig() {
+        const name = document.getElementById('cfgName').value.trim();
+        const creator = document.getElementById('cfgCreator').value.trim();
+        if (!name || !creator) { showToast('❌ Заполните поля'); return; }
+        const data = {
+            name, creator,
+            desc: document.getElementById('cfgDesc').value.trim(),
+            vpn: selectedVPN, enc: selectedEnc,
+            locked: selectedEnc === 'free'
+        };
+        if (editingIndex >= 0) {
+            configs[editingIndex] = {...configs[editingIndex], ...data};
+            showToast('✅ Обновлено');
+        } else {
+            configs.push(data);
+            showToast('✅ Создано');
+        }
+        localStorage.setItem('clumsy_configs', JSON.stringify(configs));
+        closeModal('createModal');
+        renderConfigs();
+    }
+
+    function renderColors() {
+        document.getElementById('colorGrid').innerHTML = colors.map(c => 
+            `<div class="color-opt${c===accentColor?' selected':''}" style="background:${c}" onclick="setColor('${c}',this)"></div>`
+        ).join('');
+    }
+
+    function setColor(c, el) {
+        accentColor = c;
+        document.querySelectorAll('.color-opt').forEach(b => b.classList.remove('selected'));
+        el.classList.add('selected');
+        document.querySelectorAll('.pbtn').forEach(b => b.style.background = c);
+    }
+
+    function saveCustom() {
+        localStorage.setItem('clumsy_color', accentColor);
+        showToast('✨ Применено');
+        closeModal('customModal');
+    }
+
+    function toggleSystem() {
+        const btn = document.getElementById('startBtn');
+        const badge = document.getElementById('statusBadge');
+        if (btn.textContent.includes('ЗАПУСТИТЬ')) {
+            btn.textContent = '⏹ СТОП'; btn.classList.add('stop');
+            badge.innerHTML = '● АКТИВЕН'; badge.style.color = '#4ade80';
+            showToast('✅ Запущено');
+        } else {
+            btn.textContent = '▶ ЗАПУСТИТЬ'; btn.classList.remove('stop');
+            badge.innerHTML = '● ONLINE'; badge.style.color = '#4ade80';
+            showToast('❌ Остановлено');
+        }
+    }
+
+    const savedColor = localStorage.getItem('clumsy_color');
+    if (savedColor) { accentColor = savedColor; document.querySelectorAll('.pbtn').forEach(b => b.style.background = savedColor); }
+
+    document.querySelectorAll('.modal').forEach(m => {
+        m.addEventListener('click', function(e) { if (e.target === this) this.classList.remove('active'); });
+    });
+</script>
+</body>
+</html>
