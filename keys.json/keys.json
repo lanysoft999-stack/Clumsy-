@@ -1,4 +1,5 @@
-"keys": [
+{
+  "keys": [
     {
       "key": "HESERA-VIP-HN5RTPB0-7d",
       "duration": "7d",
@@ -22,7 +23,19 @@
       "duration": "1h",
       "created": 1780092356673,
       "revoked": false
+    },
+    {
+      "key": "HESERA-HESERACFG-7NYKESNR-7d",
+      "duration": "7d",
+      "created": 1780118991756,
+      "revoked": false
+    },
+    {
+      "key": "HESERA-HESERACFG-JX3H6KQ7-7d",
+      "duration": "7d",
+      "created": 1780119002236,
+      "revoked": false
     }
   ],
-  "updated": "2026-05-29T22:06:59.319Z"
+  "updated": "2026-05-30T05:30:26.251Z"
 }
