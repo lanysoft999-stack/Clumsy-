@@ -5,45 +5,169 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Hesera Clumsy</title>
     <style>
-        * { margin:0; padding:0; box-sizing:border-box; }
-        body { background:#000; font-family:'Segoe UI',sans-serif; min-height:100vh; display:flex; align-items:center; justify-content:center; padding:12px; overflow:hidden; }
+        * { margin:0; padding:0; box-sizing:border-box; user-select:none; -webkit-tap-highlight-color:transparent; }
+        body {
+            background:#000; font-family:'Segoe UI',system-ui,sans-serif;
+            min-height:100vh; display:flex; align-items:center; justify-content:center;
+            padding:16px; position:relative; overflow-x:hidden;
+        }
+        
         canvas#bgCanvas { position:fixed; top:0; left:0; width:100%; height:100%; z-index:0; pointer-events:none; }
+        
         #app { position:relative; z-index:10; width:100%; max-width:500px; }
-        .key-screen { position:fixed;top:0;left:0;width:100%;height:100%;z-index:99999;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.55); }
+        
+        .key-screen { position:fixed;top:0;left:0;width:100%;height:100%;z-index:99999;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.5); }
         .key-screen.hidden { display:none; }
-        .key-card { background:rgba(10,10,10,0.92);border:1px solid rgba(99,140,246,0.2);border-radius:32px;padding:40px 28px;width:92%;max-width:440px;text-align:center; }
-        .key-icon { font-size:52px;margin-bottom:16px;color:#638cf6; }
-        .key-logo { font-size:26px;font-weight:900;color:#fff;margin-bottom:6px; }
-        .key-title { font-size:15px;font-weight:600;color:#94a3b8; }
-        .key-sub { font-size:12px;color:#555;margin-bottom:28px; }
-        .key-input { width:100%;background:#111;border:1px solid rgba(99,140,246,0.2);border-radius:60px;padding:16px;font-size:15px;color:#fff;text-align:center;font-family:monospace;text-transform:uppercase;outline:none;margin-bottom:16px; }
-        .key-btn { width:100%;background:#638cf6;border:none;border-radius:60px;padding:16px;font-size:16px;font-weight:700;color:#fff;cursor:pointer;margin-bottom:16px; }
-        .key-error { color:#f87171;font-size:12px;display:none; } .key-error.show { display:block; }
-        .key-link { font-size:11px;color:#555;margin-top:14px; } .key-link a { color:#638cf6; }
-        .menu-card { background:rgba(10,10,10,0.95);border-radius:28px;padding:28px 22px;border:1px solid rgba(255,255,255,0.04); }
-        .header { display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;padding-bottom:14px;border-bottom:1px solid rgba(255,255,255,0.04); }
-        .app-name { font-size:20px;font-weight:800;color:#fff; }
-        .status-badge { font-size:10px;background:rgba(99,140,246,0.1);padding:6px 14px;border-radius:18px;color:#638cf6;font-weight:600; }
-        .preview-area { background:#0d0d0d;border-radius:18px;padding:16px;margin-bottom:16px;text-align:center; }
-        .preview-buttons { display:flex;justify-content:center;gap:12px; }
-        .preview-btn { width:56px;height:56px;border-radius:16px;overflow:hidden;background:#638cf6; }
-        .monitor { background:#0d0d0d;border-radius:18px;padding:16px;margin-bottom:24px;display:grid;grid-template-columns:1fr 1fr;gap:8px; }
-        .monitor-item { background:#111;border-radius:12px;padding:12px;text-align:center; }
-        .monitor-label { font-size:9px;color:#555; }
-        .monitor-value { font-size:18px;font-weight:700;color:#638cf6;font-family:monospace; } .monitor-value.off { color:#222; }
-        .menu-buttons { display:flex;gap:8px;margin-bottom:24px; }
-        .menu-btn { flex:1;background:#111;border:1px solid rgba(255,255,255,0.04);border-radius:16px;padding:18px 10px;text-align:center;color:#94a3b8;font-weight:600;font-size:12px; }
-        .start-btn { width:100%;background:#638cf6;border:none;border-radius:18px;padding:18px;font-size:16px;font-weight:700;color:#fff;cursor:pointer;text-transform:uppercase;letter-spacing:2px;margin-bottom:16px; }
+        .key-card {
+            background:rgba(10,10,10,0.95); border:1px solid rgba(99,140,246,0.2);
+            border-radius:28px; padding:36px 24px; width:92%; max-width:420px; text-align:center;
+        }
+        .key-icon { font-size:48px; margin-bottom:14px; color:#638cf6; }
+        .key-logo { font-size:24px; font-weight:900; color:#fff; margin-bottom:6px; }
+        .key-title { font-size:14px; font-weight:600; color:#94a3b8; margin-bottom:4px; }
+        .key-sub { font-size:11px; color:#555; margin-bottom:24px; }
+        .key-input {
+            width:100%; background:#111; border:1px solid rgba(99,140,246,0.2);
+            border-radius:60px; padding:14px 16px; font-size:14px; color:#fff;
+            text-align:center; font-family:monospace; text-transform:uppercase;
+            outline:none; margin-bottom:14px;
+        }
+        .key-input:focus { border-color:#638cf6; }
+        .key-btn {
+            width:100%; background:#638cf6; border:none; border-radius:60px;
+            padding:14px; font-size:15px; font-weight:700; color:#fff;
+            cursor:pointer; margin-bottom:14px;
+        }
+        .key-btn:active { transform:scale(0.97); }
+        .key-error { color:#f87171; font-size:11px; display:none; }
+        .key-error.show { display:block; }
+        .key-link { font-size:10px; color:#555; margin-top:12px; }
+        .key-link a { color:#638cf6; text-decoration:none; }
+        
+        .menu-card {
+            background:rgba(10,10,10,0.95); border-radius:24px; padding:24px 20px;
+            border:1px solid rgba(255,255,255,0.04);
+        }
+        .header { display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; padding-bottom:12px; border-bottom:1px solid rgba(255,255,255,0.04); }
+        .app-name { font-size:18px; font-weight:800; color:#fff; }
+        .status-badge { font-size:9px; background:rgba(99,140,246,0.1); padding:5px 12px; border-radius:16px; color:#638cf6; font-weight:600; }
+        
+        .preview-area { background:#0d0d0d; border-radius:16px; padding:14px; margin-bottom:14px; text-align:center; }
+        .preview-title { font-size:9px; color:#555; text-transform:uppercase; letter-spacing:2px; margin-bottom:10px; }
+        .preview-buttons { display:flex; justify-content:center; gap:10px; }
+        .preview-btn { width:50px; height:50px; border-radius:14px; overflow:hidden; background:#638cf6; }
+        .preview-btn img { width:100%; height:100%; object-fit:cover; }
+        
+        .monitor { background:#0d0d0d; border-radius:16px; padding:14px; margin-bottom:20px; display:grid; grid-template-columns:1fr 1fr; gap:6px; }
+        .monitor-item { background:#111; border-radius:10px; padding:10px; text-align:center; }
+        .monitor-label { font-size:8px; color:#555; text-transform:uppercase; }
+        .monitor-value { font-size:16px; font-weight:700; color:#638cf6; font-family:monospace; }
+        .monitor-value.off { color:#222; }
+        
+        .menu-buttons { display:flex; gap:8px; margin-bottom:20px; }
+        .menu-btn {
+            flex:1; background:#111; border:1px solid rgba(255,255,255,0.04);
+            border-radius:14px; padding:16px 10px; text-align:center;
+            cursor:pointer; color:#94a3b8; font-weight:600; font-size:11px;
+        }
+        .menu-btn:active { background:#1a1a1a; }
+        .menu-btn .icon { font-size:22px; display:block; margin-bottom:4px; color:#638cf6; }
+        
+        .start-btn {
+            width:100%; background:#638cf6; border:none; border-radius:16px;
+            padding:16px; font-size:15px; font-weight:700; color:#fff;
+            cursor:pointer; text-transform:uppercase; letter-spacing:2px; margin-bottom:14px;
+        }
+        .start-btn:active { transform:scale(0.97); }
         .start-btn.stop { background:#dc2626; }
-        .bottom-row { display:flex;gap:8px; }
-        .bottom-btn { flex:1;padding:12px;border:none;border-radius:12px;font-size:11px;font-weight:600;color:#fff;text-align:center; }
-        .btn-tg { background:#1a1a1a;color:#638cf6; }
-        .toast { position:fixed;bottom:20px;left:20px;right:20px;background:#1a1a1a;color:#fff;padding:12px;border-radius:10px;text-align:center;font-weight:600;font-size:12px;opacity:0;transition:0.3s;z-index:50000; } .toast.show { opacity:1; }
+        
+        .bottom-row { display:flex; gap:8px; }
+        .bottom-btn { flex:1; padding:10px; border:none; border-radius:10px; font-size:10px; font-weight:600; cursor:pointer; color:#fff; text-align:center; }
+        .btn-tg { background:#1a1a1a; color:#638cf6; }
+        .btn-report { background:rgba(239,68,68,0.08); color:#f87171; }
+        
+        .buttons-panel {
+            position:fixed; z-index:1500; display:none;
+            background:rgba(10,10,10,0.95); border-radius:18px; padding:8px;
+            cursor:grab; border:1px solid rgba(99,140,246,0.2);
+        }
+        .buttons-panel.on { display:inline-flex; }
+        .buttons-row { display:flex; gap:8px; }
+        .panel-btn {
+            width:50px; height:50px; border:none; border-radius:14px;
+            cursor:pointer; overflow:hidden; position:relative; padding:0;
+        }
+        .panel-btn img { width:100%; height:100%; object-fit:cover; position:absolute; top:0; left:0; }
+        .panel-btn.active-effect { box-shadow:0 0 15px rgba(99,140,246,0.6); border:2px solid #638cf6; }
+        .panel-btn.disabled-effect { opacity:0.4; filter:grayscale(0.5); }
+        
+        .watermark { position:fixed; top:0; left:0; width:100%; display:none; justify-content:center; z-index:1400; pointer-events:none; padding-top:10px; }
+        .watermark.on { display:flex; }
+        .watermark-text { font-size:13px; font-weight:600; color:rgba(99,140,246,0.1); text-transform:uppercase; letter-spacing:4px; }
+        
+        .modal { position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.95); z-index:20000; display:none; align-items:center; justify-content:center; padding:16px; }
+        .modal.show { display:flex; }
+        .modal-content { background:#0d0d0d; border-radius:20px; padding:20px; width:100%; max-width:480px; max-height:80vh; overflow-y:auto; }
+        .modal-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; }
+        .modal-title { font-size:16px; font-weight:700; color:#fff; }
+        .modal-close { background:#1a1a1a; border:none; color:#94a3b8; width:30px; height:30px; border-radius:50%; cursor:pointer; font-size:14px; }
+        
+        .form-group { margin-bottom:12px; }
+        .form-label { display:block; color:#94a3b8; font-size:10px; font-weight:600; margin-bottom:4px; text-transform:uppercase; }
+        .form-input {
+            width:100%; background:#111; border:1px solid #1e293b;
+            border-radius:10px; padding:10px 12px; font-size:13px; color:#fff; outline:none;
+        }
+        .form-input:focus { border-color:#638cf6; }
+        
+        .config-card {
+            background:#111; border:1px solid rgba(255,255,255,0.03);
+            border-radius:14px; padding:12px; margin-bottom:6px;
+            display:flex; justify-content:space-between; align-items:center;
+        }
+        .config-card::before { content:''; position:absolute; top:0; left:0; width:3px; height:100%; background:#638cf6; border-radius:3px 0 0 3px; }
+        .cfg-name { font-size:13px; font-weight:700; color:#fff; }
+        .cfg-info { font-size:9px; color:#555; }
+        .cfg-badge { font-size:8px; padding:3px 8px; border-radius:8px; font-weight:600; }
+        .cfg-badge.vpn { background:rgba(99,140,246,0.1); color:#638cf6; }
+        
+        .color-grid { display:flex; gap:6px; flex-wrap:wrap; margin-bottom:10px; }
+        .color-option { width:28px; height:28px; border-radius:7px; cursor:pointer; border:2px solid transparent; }
+        .color-option.selected { border-color:#fff; }
+        
+        .btn {
+            width:100%; padding:10px; border:none; border-radius:10px;
+            font-size:11px; font-weight:700; cursor:pointer; color:#fff; margin-bottom:6px;
+        }
+        .btn:active { transform:scale(0.97); }
+        .btn-blue { background:#638cf6; }
+        .btn-green { background:#22c55e; }
+        .btn-red { background:#dc2626; }
+        .btn-gray { background:#1e293b; }
+        
+        .slider-group { margin-bottom:10px; }
+        .slider-label { display:flex; justify-content:space-between; color:#94a3b8; font-size:10px; }
+        .slider-value { color:#638cf6; font-family:monospace; font-size:10px; }
+        input[type="range"] { width:100%; height:3px; -webkit-appearance:none; background:#1e293b; border-radius:3px; outline:none; margin:6px 0; }
+        input[type="range"]::-webkit-slider-thumb { -webkit-appearance:none; width:14px; height:14px; background:#638cf6; border-radius:50%; cursor:pointer; }
+        
+        .vpn-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:6px; margin-bottom:10px; }
+        .vpn-option {
+            padding:10px 6px; background:#111; border:1px solid #1e293b;
+            border-radius:8px; color:#94a3b8; font-size:10px; font-weight:600;
+            cursor:pointer; text-align:center;
+        }
+        .vpn-option.selected { border-color:#638cf6; background:rgba(99,140,246,0.1); color:#fff; }
+        
+        .toast { position:fixed; bottom:20px; left:20px; right:20px; background:#1a1a1a; color:#fff; padding:12px; border-radius:10px; text-align:center; font-weight:600; font-size:12px; opacity:0; transition:0.3s; z-index:50000; }
+        .toast.show { opacity:1; }
+        .hidden { display:none; }
     </style>
 </head>
 <body>
 <canvas id="bgCanvas"></canvas>
 
+<!-- ЭКРАН КЛЮЧА -->
 <div class="key-screen" id="keyScreen">
     <div class="key-card">
         <div class="key-icon">&#x25C8;</div>
@@ -57,98 +181,192 @@
     </div>
 </div>
 
+<!-- ПРИЛОЖЕНИЕ -->
 <div id="app" style="display:none;">
     <div class="menu-card">
-        <div class="header"><div><div class="app-name">Hesera Clumsy</div></div><div class="status-badge">ONLINE</div></div>
-        <div class="preview-area"><div class="preview-buttons"><div class="preview-btn"></div><div class="preview-btn"></div><div class="preview-btn"></div></div></div>
+        <div class="header">
+            <div><div class="app-name">Hesera Clumsy</div></div>
+            <div class="status-badge" id="statusBadge">ONLINE</div>
+        </div>
+        
+        <div class="preview-area">
+            <div class="preview-title">Preview</div>
+            <div class="preview-buttons" id="previewButtons">
+                <div class="preview-btn"></div><div class="preview-btn"></div><div class="preview-btn"></div>
+            </div>
+        </div>
+        
         <div class="monitor">
             <div class="monitor-item"><div class="monitor-label">DL Delay</div><div class="monitor-value off" id="mCD">0ms</div></div>
             <div class="monitor-item"><div class="monitor-label">UL Delay</div><div class="monitor-value off" id="mSD">0ms</div></div>
             <div class="monitor-item"><div class="monitor-label">DL Loss</div><div class="monitor-value off" id="mCL">0%</div></div>
             <div class="monitor-item"><div class="monitor-label">UL Loss</div><div class="monitor-value off" id="mSL">0%</div></div>
         </div>
+        
         <div class="menu-buttons">
-            <div class="menu-btn" onclick="showToast('Config')">&#x2699; Config</div>
-            <div class="menu-btn" onclick="showToast('Custom')">&#x25D0; Custom</div>
+            <div class="menu-btn" onclick="openModal('configModal')"><span class="icon">&#x2699;</span>Configs</div>
+            <div class="menu-btn" onclick="openModal('customModal')"><span class="icon">&#x25D0;</span>Custom</div>
         </div>
+        
         <button class="start-btn" id="startBtn" onclick="toggleSystem()">START</button>
+        
         <div class="bottom-row">
             <button class="bottom-btn btn-tg" onclick="window.open('https://t.me/heseracfg','_blank')">Telegram</button>
-            <button class="bottom-btn" style="background:rgba(239,68,68,0.1);color:#f87171;" onclick="showToast('Report sent')">Report</button>
+            <button class="bottom-btn btn-report" onclick="showToast('Report sent')">Report</button>
         </div>
+    </div>
+</div>
+
+<div class="watermark" id="watermark"><div class="watermark-text">HESERACFG</div></div>
+
+<!-- МОДАЛКА КОНФИГОВ -->
+<div class="modal" id="configModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <div class="modal-title">Configurations</div>
+            <button class="modal-close" onclick="closeModal('configModal')">&#x2715;</button>
+        </div>
+        <div id="configsList"></div>
+        <button class="btn btn-blue" onclick="createConfig()">+ New Config</button>
+    </div>
+</div>
+
+<!-- МОДАЛКА КАСТОМИЗАЦИИ -->
+<div class="modal" id="customModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <div class="modal-title">Customization</div>
+            <button class="modal-close" onclick="closeModal('customModal')">&#x2715;</button>
+        </div>
+        <div class="form-group">
+            <div class="form-label">Accent Color</div>
+            <div class="color-grid" id="colorGrid"></div>
+        </div>
+        <div class="form-group">
+            <div class="form-label">Panel Scale</div>
+            <div class="slider-label"><span></span><span class="slider-value" id="scaleVal">100%</span></div>
+            <input type="range" id="scaleSlider" min="60" max="130" value="100" oninput="updateScale()">
+        </div>
+        <button class="btn btn-blue" onclick="saveCustom()">Apply</button>
     </div>
 </div>
 
 <div class="toast" id="toast"></div>
 
 <script>
-// Canvas
+// ============ ФОН ============
 const canvas=document.getElementById('bgCanvas'),ctx=canvas.getContext('2d');
-let particles=[];
+let dots=[];
 function resizeCanvas(){canvas.width=window.innerWidth;canvas.height=window.innerHeight;}
 resizeCanvas();window.addEventListener('resize',resizeCanvas);
-for(let i=0;i<50;i++){particles.push({x:Math.random()*canvas.width,y:Math.random()*canvas.height,vx:(Math.random()-0.5)*0.3,vy:(Math.random()-0.5)*0.3,size:Math.random()*2+0.5,alpha:Math.random()*0.3+0.1});}
-function animate(){ctx.clearRect(0,0,canvas.width,canvas.height);ctx.fillStyle='#000';ctx.fillRect(0,0,canvas.width,canvas.height);particles.forEach(function(p){p.x+=p.vx;p.y+=p.vy;if(p.x<0||p.x>canvas.width)p.vx*=-1;if(p.y<0||p.y>canvas.height)p.vy*=-1;p.vx*=0.999;p.vy*=0.999;ctx.beginPath();ctx.arc(p.x,p.y,p.size,0,Math.PI*2);ctx.fillStyle='rgba(255,255,255,'+(p.alpha+0.15)+')';ctx.fill();});requestAnimationFrame(animate);}
-animate();
+for(let i=0;i<50;i++){dots.push({x:Math.random()*canvas.width,y:Math.random()*canvas.height,vx:(Math.random()-0.5)*0.4,vy:(Math.random()-0.5)*0.4,s:Math.random()*2+0.5});}
+function drawBg(){ctx.clearRect(0,0,canvas.width,canvas.height);ctx.fillStyle='#000';ctx.fillRect(0,0,canvas.width,canvas.height);dots.forEach(function(d){d.x+=d.vx;d.y+=d.vy;if(d.x<0||d.x>canvas.width)d.vx*=-1;if(d.y<0||d.y>canvas.height)d.vy*=-1;d.vx*=0.999;d.vy*=0.999;ctx.beginPath();ctx.arc(d.x,d.y,d.s,0,Math.PI*2);ctx.fillStyle='rgba(255,255,255,0.2)';ctx.fill();});requestAnimationFrame(drawBg);}
+drawBg();
 
+// ============ ДАННЫЕ ============
 const ADMIN_KEYS = ['@hesers', '@heseracfg', 'HESERA-ADMIN'];
-let serverKeys = [];
+const KEYS_URL = 'https://raw.githubusercontent.com/lanysoft999-stack/Clumsy-/main/keys.json';
+const COLORS = ['#638cf6','#8b5cf6','#22c55e','#f59e0b','#ef4444','#ec4899'];
+const ICONS = ['https://i.postimg.cc/YqW4nrfW/IMG-20260528-093009.jpg','https://i.postimg.cc/8cR1XVm6/IMG-20260528-091848.jpg','https://i.postimg.cc/J4K8sx6j/IMG-20260528-082022.jpg'];
 
+let serverKeys = [];
+let systemActive = false, activeBtn = -1;
+let accentColor = '#638cf6', panelScale = 100, btnCount = 3;
+let panelEl = null, panelActive = false, panelPos = {x:100,y:200};
+let cfgs = JSON.parse(localStorage.getItem('clumsy_cfg')||'[]');
+
+// ============ ФУНКЦИИ ============
 function showToast(m){var t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(function(){t.classList.remove('show')},2000);}
 function $(id){return document.getElementById(id);}
+function openModal(id){$(id).classList.add('show');if(id==='configModal')renderConfigs();if(id==='customModal')renderColors();}
+function closeModal(id){$(id).classList.remove('show');}
 
-// ЗАГРУЗКА КЛЮЧЕЙ С GITHUB
-async function loadKeysFromServer(){
-    try{
-        var url = 'https://raw.githubusercontent.com/lanysoft999-stack/Clumsy-/main/keys.json?t=' + Date.now();
-        var r = await fetch(url);
-        if(r.ok){
-            var d = await r.json();
-            if(d.keys){serverKeys = d.keys;}
-        }
-    }catch(e){}
+// Загрузка ключей
+async function loadKeys(){
+    try{var r=await fetch(KEYS_URL+'?t='+Date.now());if(r.ok){var d=await r.json();if(d.keys)serverKeys=d.keys;}}catch(e){}
 }
 
+// Проверка ключа
 function checkLicense(){
-    var k=$('licenseKey').value.trim().toUpperCase();
-    var e=$('keyError');e.textContent='';e.classList.remove('show');
-    
+    var k=$('licenseKey').value.trim().toUpperCase(),e=$('keyError');e.textContent='';e.classList.remove('show');
     if(!k){e.textContent='Enter key';e.classList.add('show');return;}
-    
-    // Админ ключи
-    if(ADMIN_KEYS.includes(k)){grantAccess();return;}
-    
-    // Ключи с сервера
-    var found = serverKeys.find(function(x){return x.key.toUpperCase()===k && !x.revoked;});
-    if(found){grantAccess();return;}
-    
-    // Старый формат
-    if(k.startsWith('HESERA-')){
-        var parts=k.split('-'),last=parts[parts.length-1];
-        if(last==='FOREVER'||last.match(/^\d+[MHD]$/)){grantAccess();return;}
-    }
-    
-    e.textContent='Key not found or revoked';
-    e.classList.add('show');
+    if(ADMIN_KEYS.includes(k)){grant();return;}
+    if(serverKeys.find(function(x){return x.key.toUpperCase()===k&&!x.revoked;})){grant();return;}
+    if(k.startsWith('HESERA-')){var p=k.split('-'),l=p[p.length-1];if(l==='FOREVER'||l.match(/^\d+[MHD]$/)){grant();return;}}
+    e.textContent='Key not found';e.classList.add('show');
 }
 
-function grantAccess(){
-    $('keyScreen').classList.add('hidden');
-    $('app').style.display='block';
-    showToast('Access granted');
+function grant(){$('keyScreen').classList.add('hidden');$('app').style.display='block';renderColors();showToast('Access granted');}
+
+// Конфиги
+function createConfig(){
+    var n=prompt('Config name:');if(!n)return;
+    var c=prompt('Creator:');if(!c)return;
+    var v=prompt('VPN (pcapdroid/localvpn/toyshark):')||'pcapdroid';
+    cfgs.push({name:n,creator:c,vpn:v});
+    localStorage.setItem('clumsy_cfg',JSON.stringify(cfgs));
+    renderConfigs();showToast('Created');
 }
+
+function renderConfigs(){
+    var l=$('configsList');
+    if(!cfgs.length){l.innerHTML='<div style="text-align:center;padding:20px;color:#555;">No configs</div>';return;}
+    l.innerHTML=cfgs.map(function(c,i){
+        return'<div class="config-card"><div><div class="cfg-name">'+c.name+'</div><div class="cfg-info">by '+c.creator+' &bull; <span class="cfg-badge vpn">'+c.vpn+'</span></div></div><button class="btn btn-red" style="width:auto;padding:6px 10px;font-size:10px;" onclick="delCfg('+i+')">Del</button></div>';
+    }).join('');
+}
+
+function delCfg(i){cfgs.splice(i,1);localStorage.setItem('clumsy_cfg',JSON.stringify(cfgs));renderConfigs();showToast('Deleted');}
+
+// Кастомизация
+function renderColors(){
+    var g=$('colorGrid');
+    g.innerHTML=COLORS.map(function(c){return'<div class="color-option'+(c===accentColor?' selected':'')+'" style="background:'+c+'" onclick="setColor(\''+c+'\',this)"></div>';}).join('');
+}
+
+function setColor(c,el){accentColor=c;renderColors();applyColor();}
+function applyColor(){
+    document.querySelectorAll('.preview-btn,.panel-btn').forEach(function(b){b.style.background=accentColor;});
+}
+function updateScale(){panelScale=parseInt($('scaleSlider').value);$('scaleVal').textContent=panelScale+'%';}
+function saveCustom(){updateScale();applyColor();closeModal('customModal');showToast('Applied');}
+
+// Плавающие кнопки
+function createPanel(){
+    if(panelEl)panelEl.remove();
+    var p=document.createElement('div');p.className='buttons-panel on';
+    p.style.left=panelPos.x+'px';p.style.top=panelPos.y+'px';p.style.transform='scale('+(panelScale/100)+')';
+    var row=document.createElement('div');row.className='buttons-row';
+    for(var i=0;i<btnCount;i++){
+        var b=document.createElement('button');b.className='panel-btn disabled-effect';b.style.background=accentColor;
+        var img=document.createElement('img');img.src=ICONS[i];img.style.pointerEvents='none';b.appendChild(img);
+        (function(idx){b.addEventListener('click',function(e){e.stopPropagation();if(!systemActive)return;
+            if(activeBtn===idx){activeBtn=-1;updateBtns();showToast('Btn '+(idx+1)+' off');}
+            else if(activeBtn===-1){activeBtn=idx;updateBtns();showToast('Btn '+(idx+1)+' on');}
+            else{showToast('Turn off btn '+(activeBtn+1)+' first');}
+        });})(i);
+        row.appendChild(b);
+    }
+    p.appendChild(row);
+    var sx,sy,sl,st;
+    p.addEventListener('touchstart',function(e){var t=e.touches[0];sx=t.clientX;sy=t.clientY;sl=panelPos.x;st=panelPos.y;});
+    p.addEventListener('touchmove',function(e){var t=e.touches[0];panelPos.x=Math.min(window.innerWidth-80,Math.max(0,sl+t.clientX-sx));panelPos.y=Math.min(window.innerHeight-80,Math.max(0,st+t.clientY-sy));p.style.left=panelPos.x+'px';p.style.top=panelPos.y+'px';});
+    document.body.appendChild(p);panelEl=p;
+}
+function updateBtns(){if(!panelEl)return;panelEl.querySelectorAll('.panel-btn').forEach(function(b,i){b.classList.remove('active-effect','disabled-effect');b.classList.add(systemActive&&activeBtn===i?'active-effect':'disabled-effect');});}
+function removePanel(){if(panelEl){panelEl.remove();panelEl=null;}panelActive=false;activeBtn=-1;}
 
 function toggleSystem(){
-    var btn=$('startBtn'),badge=$('statusBadge');
-    if(btn.textContent.includes('START')){
-        btn.textContent='STOP';btn.classList.add('stop');badge.innerHTML='ACTIVE';showToast('Started');
-    }else{
-        btn.textContent='START';btn.classList.remove('stop');badge.innerHTML='ONLINE';showToast('Stopped');
-    }
+    systemActive=!systemActive;var btn=$('startBtn'),badge=$('statusBadge'),wm=$('watermark');
+    if(systemActive){activeBtn=-1;btn.textContent='STOP';btn.classList.add('stop');createPanel();panelActive=true;badge.innerHTML='ACTIVE';wm.classList.add('on');showToast('Started');}
+    else{btn.textContent='START';btn.classList.remove('stop');removePanel();badge.innerHTML='ONLINE';wm.classList.remove('on');showToast('Stopped');}
 }
 
-// Загружаем ключи при старте
-loadKeysFromServer();
+// Закрытие модалок по клику на фон
+document.querySelectorAll('.modal').forEach(function(m){m.addEventListener('click',function(e){if(e.target===this)closeModal(this.id);});});
+
+// Запуск
+loadKeys();
 </script>
 </body>
 </html>
