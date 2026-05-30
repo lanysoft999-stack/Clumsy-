@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Hesera Clumsy</title>
     <style>
-        * { margin:0; padding:0; box-sizing:border-box; user-select:none; -webkit-tap-highlight-color:transparent; }
+        * { margin:0; padding:0; box-sizing:border-box; }
         body { background:#000; font-family:'Segoe UI',sans-serif; min-height:100vh; display:flex; align-items:center; justify-content:center; padding:12px; overflow:hidden; }
         canvas#bgCanvas { position:fixed; top:0; left:0; width:100%; height:100%; z-index:0; pointer-events:none; }
         #app { position:relative; z-index:10; width:100%; max-width:500px; }
@@ -17,43 +17,27 @@
         .key-title { font-size:15px;font-weight:600;color:#94a3b8; }
         .key-sub { font-size:12px;color:#555;margin-bottom:28px; }
         .key-input { width:100%;background:#111;border:1px solid rgba(99,140,246,0.2);border-radius:60px;padding:16px;font-size:15px;color:#fff;text-align:center;font-family:monospace;text-transform:uppercase;outline:none;margin-bottom:16px; }
-        .key-input:focus { border-color:#638cf6; }
         .key-btn { width:100%;background:#638cf6;border:none;border-radius:60px;padding:16px;font-size:16px;font-weight:700;color:#fff;cursor:pointer;margin-bottom:16px; }
-        .key-btn:active { transform:scale(0.97); }
-        .key-error { color:#f87171;font-size:12px;display:none; }
-        .key-error.show { display:block; }
+        .key-error { color:#f87171;font-size:12px;display:none; } .key-error.show { display:block; }
         .key-link { font-size:11px;color:#555;margin-top:14px; } .key-link a { color:#638cf6; }
         .menu-card { background:rgba(10,10,10,0.95);border-radius:28px;padding:28px 22px;border:1px solid rgba(255,255,255,0.04); }
         .header { display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;padding-bottom:14px;border-bottom:1px solid rgba(255,255,255,0.04); }
         .app-name { font-size:20px;font-weight:800;color:#fff; }
         .status-badge { font-size:10px;background:rgba(99,140,246,0.1);padding:6px 14px;border-radius:18px;color:#638cf6;font-weight:600; }
         .preview-area { background:#0d0d0d;border-radius:18px;padding:16px;margin-bottom:16px;text-align:center; }
-        .preview-title { font-size:10px;color:#555;text-transform:uppercase;letter-spacing:2px;margin-bottom:14px; }
         .preview-buttons { display:flex;justify-content:center;gap:12px; }
-        .preview-btn { width:56px;height:56px;border-radius:16px;overflow:hidden; }
-        .preview-btn img { width:100%;height:100%;object-fit:cover; }
+        .preview-btn { width:56px;height:56px;border-radius:16px;overflow:hidden;background:#638cf6; }
         .monitor { background:#0d0d0d;border-radius:18px;padding:16px;margin-bottom:24px;display:grid;grid-template-columns:1fr 1fr;gap:8px; }
         .monitor-item { background:#111;border-radius:12px;padding:12px;text-align:center; }
         .monitor-label { font-size:9px;color:#555; }
         .monitor-value { font-size:18px;font-weight:700;color:#638cf6;font-family:monospace; } .monitor-value.off { color:#222; }
         .menu-buttons { display:flex;gap:8px;margin-bottom:24px; }
-        .menu-btn { flex:1;background:#111;border:1px solid rgba(255,255,255,0.04);border-radius:16px;padding:18px 10px;text-align:center;cursor:pointer;color:#94a3b8;font-weight:600;font-size:12px; }
-        .menu-btn .icon { font-size:24px;display:block;margin-bottom:4px;color:#638cf6; }
+        .menu-btn { flex:1;background:#111;border:1px solid rgba(255,255,255,0.04);border-radius:16px;padding:18px 10px;text-align:center;color:#94a3b8;font-weight:600;font-size:12px; }
         .start-btn { width:100%;background:#638cf6;border:none;border-radius:18px;padding:18px;font-size:16px;font-weight:700;color:#fff;cursor:pointer;text-transform:uppercase;letter-spacing:2px;margin-bottom:16px; }
         .start-btn.stop { background:#dc2626; }
         .bottom-row { display:flex;gap:8px; }
-        .bottom-btn { flex:1;padding:12px;border:none;border-radius:12px;font-size:11px;font-weight:600;cursor:pointer;color:#fff;text-align:center; }
+        .bottom-btn { flex:1;padding:12px;border:none;border-radius:12px;font-size:11px;font-weight:600;color:#fff;text-align:center; }
         .btn-tg { background:#1a1a1a;color:#638cf6; }
-        .btn-report { background:rgba(239,68,68,0.08);color:#f87171; }
-        .buttons-panel { position:fixed;z-index:1500;display:none;background:rgba(10,10,10,0.95);border-radius:20px;padding:10px;cursor:grab;border:1px solid rgba(99,140,246,0.25); }
-        .buttons-panel.on { display:inline-flex; }
-        .panel-btn { width:56px;height:56px;border:none;border-radius:16px;cursor:pointer;overflow:hidden;position:relative;padding:0; }
-        .panel-btn img { width:100%;height:100%;object-fit:cover;position:absolute;top:0;left:0; }
-        .panel-btn.active-effect { box-shadow:0 0 20px rgba(99,140,246,0.6);border:2px solid #638cf6; }
-        .panel-btn.disabled-effect { opacity:0.4;filter:grayscale(0.6); }
-        .watermark { position:fixed;top:0;left:0;width:100%;display:none;justify-content:center;z-index:1400;padding-top:12px; }
-        .watermark.on { display:flex; }
-        .watermark-text { font-size:14px;font-weight:600;color:rgba(99,140,246,0.1);text-transform:uppercase;letter-spacing:4px; }
         .toast { position:fixed;bottom:20px;left:20px;right:20px;background:#1a1a1a;color:#fff;padding:12px;border-radius:10px;text-align:center;font-weight:600;font-size:12px;opacity:0;transition:0.3s;z-index:50000; } .toast.show { opacity:1; }
     </style>
 </head>
@@ -76,7 +60,7 @@
 <div id="app" style="display:none;">
     <div class="menu-card">
         <div class="header"><div><div class="app-name">Hesera Clumsy</div></div><div class="status-badge">ONLINE</div></div>
-        <div class="preview-area"><div class="preview-title">Button Preview</div><div class="preview-buttons" id="previewButtons"></div></div>
+        <div class="preview-area"><div class="preview-buttons"><div class="preview-btn"></div><div class="preview-btn"></div><div class="preview-btn"></div></div></div>
         <div class="monitor">
             <div class="monitor-item"><div class="monitor-label">DL Delay</div><div class="monitor-value off" id="mCD">0ms</div></div>
             <div class="monitor-item"><div class="monitor-label">UL Delay</div><div class="monitor-value off" id="mSD">0ms</div></div>
@@ -84,80 +68,86 @@
             <div class="monitor-item"><div class="monitor-label">UL Loss</div><div class="monitor-value off" id="mSL">0%</div></div>
         </div>
         <div class="menu-buttons">
-            <div class="menu-btn" onclick="showToast('Config')"><span class="icon">&#x2699;</span>Config</div>
-            <div class="menu-btn" onclick="showToast('Custom')"><span class="icon">&#x25D0;</span>Custom</div>
+            <div class="menu-btn" onclick="showToast('Config')">&#x2699; Config</div>
+            <div class="menu-btn" onclick="showToast('Custom')">&#x25D0; Custom</div>
         </div>
         <button class="start-btn" id="startBtn" onclick="toggleSystem()">START</button>
         <div class="bottom-row">
             <button class="bottom-btn btn-tg" onclick="window.open('https://t.me/heseracfg','_blank')">Telegram</button>
-            <button class="bottom-btn btn-report" onclick="showToast('Report sent')">Report</button>
+            <button class="bottom-btn" style="background:rgba(239,68,68,0.1);color:#f87171;" onclick="showToast('Report sent')">Report</button>
         </div>
     </div>
 </div>
 
-<div class="watermark" id="watermark"><div class="watermark-text">HESERACFG</div></div>
 <div class="toast" id="toast"></div>
 
 <script>
 // Canvas
 const canvas=document.getElementById('bgCanvas'),ctx=canvas.getContext('2d');
-let particles=[],mouseX=-1000,mouseY=-1000;
+let particles=[];
 function resizeCanvas(){canvas.width=window.innerWidth;canvas.height=window.innerHeight;}
 resizeCanvas();window.addEventListener('resize',resizeCanvas);
-for(let i=0;i<60;i++){particles.push({x:Math.random()*canvas.width,y:Math.random()*canvas.height,vx:(Math.random()-0.5)*0.3,vy:(Math.random()-0.5)*0.3,size:Math.random()*2+0.5,alpha:Math.random()*0.3+0.1});}
-document.addEventListener('mousemove',function(e){mouseX=e.clientX;mouseY=e.clientY;});
-document.addEventListener('touchmove',function(e){mouseX=e.touches[0].clientX;mouseY=e.touches[0].clientY;});
+for(let i=0;i<50;i++){particles.push({x:Math.random()*canvas.width,y:Math.random()*canvas.height,vx:(Math.random()-0.5)*0.3,vy:(Math.random()-0.5)*0.3,size:Math.random()*2+0.5,alpha:Math.random()*0.3+0.1});}
 function animate(){ctx.clearRect(0,0,canvas.width,canvas.height);ctx.fillStyle='#000';ctx.fillRect(0,0,canvas.width,canvas.height);particles.forEach(function(p){p.x+=p.vx;p.y+=p.vy;if(p.x<0||p.x>canvas.width)p.vx*=-1;if(p.y<0||p.y>canvas.height)p.vy*=-1;p.vx*=0.999;p.vy*=0.999;ctx.beginPath();ctx.arc(p.x,p.y,p.size,0,Math.PI*2);ctx.fillStyle='rgba(255,255,255,'+(p.alpha+0.15)+')';ctx.fill();});requestAnimationFrame(animate);}
 animate();
 
-// Приложение
 const ADMIN_KEYS = ['@hesers', '@heseracfg', 'HESERA-ADMIN'];
-const KEYS_URL = 'https://raw.githubusercontent.com/lanysoft999-stack/Clumsy-/main/keys.json';
 let serverKeys = [];
-let systemActive = false, panelEl = null, panelPos = {x:100,y:150};
 
 function showToast(m){var t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(function(){t.classList.remove('show')},2000);}
 function $(id){return document.getElementById(id);}
 
+// ЗАГРУЗКА КЛЮЧЕЙ С GITHUB
 async function loadKeysFromServer(){
     try{
-        var r = await fetch(KEYS_URL + '?t=' + Date.now());
-        if(!r.ok) throw new Error('Failed');
-        var d = await r.json();
-        if(d.keys){serverKeys = d.keys;console.log('Keys loaded: '+serverKeys.length);}
-    }catch(e){console.log('Offline mode');}
+        var url = 'https://raw.githubusercontent.com/lanysoft999-stack/Clumsy-/main/keys.json?t=' + Date.now();
+        var r = await fetch(url);
+        if(r.ok){
+            var d = await r.json();
+            if(d.keys){serverKeys = d.keys;}
+        }
+    }catch(e){}
 }
 
 function checkLicense(){
-    var k=$('licenseKey').value.trim().toUpperCase(),e=$('keyError');e.textContent='';e.classList.remove('show');
+    var k=$('licenseKey').value.trim().toUpperCase();
+    var e=$('keyError');e.textContent='';e.classList.remove('show');
+    
     if(!k){e.textContent='Enter key';e.classList.add('show');return;}
+    
+    // Админ ключи
     if(ADMIN_KEYS.includes(k)){grantAccess();return;}
-    if(serverKeys.find(function(x){return x.key===k&&!x.revoked;})){grantAccess();return;}
-    if(!k.startsWith('HESERA-')){e.textContent='Invalid format';e.classList.add('show');return;}
-    var p=k.split('-'),last=p[p.length-1];
-    if(last==='FOREVER'||last.match(/^\d+[mhd]$/)){grantAccess();return;}
-    e.textContent='Key not found';e.classList.add('show');
+    
+    // Ключи с сервера
+    var found = serverKeys.find(function(x){return x.key.toUpperCase()===k && !x.revoked;});
+    if(found){grantAccess();return;}
+    
+    // Старый формат
+    if(k.startsWith('HESERA-')){
+        var parts=k.split('-'),last=parts[parts.length-1];
+        if(last==='FOREVER'||last.match(/^\d+[MHD]$/)){grantAccess();return;}
+    }
+    
+    e.textContent='Key not found or revoked';
+    e.classList.add('show');
 }
 
-function grantAccess(){$('keyScreen').classList.add('hidden');$('app').style.display='block';showToast('Access granted');}
+function grantAccess(){
+    $('keyScreen').classList.add('hidden');
+    $('app').style.display='block';
+    showToast('Access granted');
+}
 
 function toggleSystem(){
-    systemActive=!systemActive;var btn=$('startBtn'),badge=$('statusBadge'),wm=$('watermark');
-    if(systemActive){
-        btn.textContent='STOP';btn.classList.add('stop');badge.innerHTML='ACTIVE';wm.classList.add('on');
-        if(panelEl)panelEl.remove();
-        var p=document.createElement('div');p.className='buttons-panel on';p.style.left=panelPos.x+'px';p.style.top=panelPos.y+'px';
-        var row=document.createElement('div');row.className='buttons-row';
-        for(var i=0;i<3;i++){var b=document.createElement('button');b.className='panel-btn disabled-effect';b.style.background='#638cf6';b.textContent=i+1;b.style.color='#fff';b.style.fontWeight='700';row.appendChild(b);}
-        p.appendChild(row);document.body.appendChild(p);panelEl=p;
-        showToast('System started');
+    var btn=$('startBtn'),badge=$('statusBadge');
+    if(btn.textContent.includes('START')){
+        btn.textContent='STOP';btn.classList.add('stop');badge.innerHTML='ACTIVE';showToast('Started');
     }else{
-        btn.textContent='START';btn.classList.remove('stop');badge.innerHTML='ONLINE';wm.classList.remove('on');
-        if(panelEl){panelEl.remove();panelEl=null;}
-        showToast('System stopped');
+        btn.textContent='START';btn.classList.remove('stop');badge.innerHTML='ONLINE';showToast('Stopped');
     }
 }
 
+// Загружаем ключи при старте
 loadKeysFromServer();
 </script>
 </body>
