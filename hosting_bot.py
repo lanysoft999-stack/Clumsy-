@@ -1,4 +1,4 @@
-# hosting_bot.py - Хостинг бот v16.6 (Анти-сон в конце файла)
+# hosting_bot.py - Хостинг бот v16.7 (Render Disk - постоянное хранение)
 import telebot
 from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton, ReplyKeyboardMarkup, KeyboardButton, BotCommand, MenuButtonCommands, MessageEntity
 import os, sys, sqlite3, threading, time, uuid, shutil, zipfile, subprocess, signal, requests, json, logging, tempfile
@@ -32,14 +32,15 @@ class MemoryCache:
 cache = MemoryCache(max_size=500)
 
 TOKEN = "8964647336:AAHs5cGpAuSGaXbDBeG-lmS6z0fgXIEM2rs"
-VERSION = "16.6.0"
+VERSION = "16.7.0"
 ADMIN_IDS = [314148464]
 CRYPTO_TOKEN = "593773:AA2SggSE9MiTxJ6jdir8g7ufY2Cd2Pchvhu"
 CRYPTO_API = "https://pay.crypt.bot/api"
 SUPPORT_USERNAME = "hesers"
 SUPPORT_URL = "https://t.me/hesers"
 
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+# Пути для Render с постоянным диском
+BASE_DIR = "/data" if os.path.exists("/data") else os.path.dirname(os.path.abspath(__file__))
 SCRIPTS_DIR = os.path.join(BASE_DIR, "scripts")
 LOGS_DIR = os.path.join(BASE_DIR, "logs")
 TEMP_DIR = os.path.join(BASE_DIR, "temp")
@@ -1100,7 +1101,6 @@ def finish(uid, sp, ofn):
 
 # ========== МОНИТОРИНГ С УВЕДОМЛЕНИЯМИ ==========
 def monitor():
-    """Проверяет истекающие подписки и отправляет уведомления"""
     last_admin_notify = None
     while True:
         try:
@@ -1204,7 +1204,6 @@ signal.signal(signal.SIGINT, lambda s,f: sys.exit(0))
 
 # ========== АНТИ-СОН ==========
 def keep_alive():
-    """Пингует Telegram API каждые 5 минут чтобы бот не засыпал"""
     while True:
         time.sleep(300)
         try:
