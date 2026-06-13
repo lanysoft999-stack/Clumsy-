@@ -1,0 +1,25 @@
+# Токены
+*.token
+token.txt
+.env
+
+# База данных
+*.db
+*.sqlite
+
+# Логи
+logs/
+*.log
+
+# Временные файлы
+temp/
+__pycache__/
+*.pyc
+
+# IDE
+.vscode/
+.idea/
+
+# Системные
+.DS_Store
+Thumbs.db
